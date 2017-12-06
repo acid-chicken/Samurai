@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 namespace AcidChicken.Samurai
 {
     using Models;
+    using Modules;
 
     public static class Program
     {
@@ -40,6 +41,7 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += LogAsync;
+            DiscordClient.Ready += ModuleManager.InstallAsync;
 
             await DiscordClient.LoginAsync(TokenType.Bot, Config.DiscordToken).ConfigureAwait(false);
             await DiscordClient.StartAsync().ConfigureAwait(false);
