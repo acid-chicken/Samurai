@@ -41,7 +41,8 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += LogAsync;
-            DiscordClient.Ready += ModuleManager.InstallAsync;
+
+            await ModuleManager.InstallAsync().ConfigureAwait(false);
 
             await DiscordClient.LoginAsync(TokenType.Bot, Config.DiscordToken).ConfigureAwait(false);
             await DiscordClient.StartAsync().ConfigureAwait(false);

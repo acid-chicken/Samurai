@@ -34,7 +34,7 @@ namespace AcidChicken.Samurai.Modules
         {
             var position = 0;
             var message = socketMessage as SocketUserMessage;
-            if (message == null || !(message.HasMentionPrefix(Program.DiscordClient.CurrentUser, ref position)) || !(message.HasStringPrefix(Prefix, ref position))) return;
+            if (message == null || !((message.HasMentionPrefix(Program.DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position)))) return;
             var context = new CommandContext(Program.DiscordClient, message);
             var result = await Service.ExecuteAsync(context, position);
             if (!result.IsSuccess)
