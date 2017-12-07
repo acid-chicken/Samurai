@@ -10,6 +10,7 @@ namespace AcidChicken.Samurai
 {
     using Models;
     using Modules;
+    using Tasks;
 
     public static class Program
     {
@@ -41,6 +42,7 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += LogAsync;
+            DiscordClient.Ready += TickerManager.WorkAsync;
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 
