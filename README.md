@@ -1,8 +1,9 @@
-# Samurai
-
-[![Widget](https://discordapp.com/api/guilds/387920616252243968/widget.png)](https://discord.gg/xmWd3yy)
-
-An Discord bot for BitZeny users.
+<div align="center">
+  <img src="Assets/Samurai.png" alt="Samurai Logo" height="256">
+  <h1>Samurai</h1>
+  <a href="https://discord.gg/xmWd3yy" target="_blank"><img src="https://discordapp.com/api/guilds/387920616252243968/widget.png" alt="Discord Widget"></a>
+  <p>An Discord bot for BitZeny users.</p>
+</div>
 
 ## License
 
