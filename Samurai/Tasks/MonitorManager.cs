@@ -68,6 +68,7 @@ namespace AcidChicken.Samurai.Tasks
                                 .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
                     ).ConfigureAwait(false);
                 }
+                await Program.LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
