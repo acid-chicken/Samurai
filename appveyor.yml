@@ -8,7 +8,7 @@ configuration:
 - Release
 platform: Any CPU
 init:
-- cmd: dotnet restore --project Samurai.csproj
+- cmd: dotnet restore Samurai.csproj
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
