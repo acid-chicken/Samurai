@@ -2,6 +2,7 @@
   <img src="assets/Samurai.png" alt="Samurai Logo" height="256">
   <h1>Samurai</h1>
   <a href="https://ci.appveyor.com/project/acid-chicken/Samurai"><img src="https://ci.appveyor.com/api/projects/status/k7koen45vjy9xd49?svg=true" alt="AppVeyor Widget"></a>
+  <a href="https://travis-ci.org/acid-chicken/Samurai"><img src="https://api.travis-ci.org/acid-chicken/Samurai.svg?branch=master" alt="Travis CI Widget"></a>
   <a href="https://discord.gg/xmWd3yy" target="_blank"><img src="https://discordapp.com/api/guilds/387920616252243968/widget.png" alt="Discord Widget"></a>
   <p>An Discord bot for BitZeny users.</p>
 </div>
