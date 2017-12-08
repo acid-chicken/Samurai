@@ -39,7 +39,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithColor(Colors.Blue)
                             .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
-                );
+                ).ConfigureAwait(false);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithColor(Colors.Green)
                                 .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
-                    );
+                    ).ConfigureAwait(false);
                 }
             }
         }
