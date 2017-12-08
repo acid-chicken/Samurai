@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -9,6 +10,7 @@ namespace AcidChicken.Samurai.Modules
 {
     using Assets;
 
+    [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase
     {
         [Command("help"), Summary("コマンドのヘルプを表示します。"), Alias("ヘルプ", "?")]
@@ -24,13 +26,22 @@ namespace AcidChicken.Samurai.Modules
                         {
                             Fields =
                                 ModuleManager.Service.Commands
-                                    .Select
-                                    (x =>
-                                        new EmbedFieldBuilder()
-                                            .WithName(x.Name)
-                                            .WithValue(x.Summary)
-                                            .WithIsInline(true)
-                                    )
+                                    .Select(x =>
+                                    {
+                                        var builder = new StringBuilder();
+                                        var module = x.Module;
+                                        while (!string.IsNullOrEmpty(module?.Name))
+                                        {
+                                            builder.Insert(0, $"{x.Module.Name} ");
+                                            module = module.Parent;
+                                        }
+                                        builder.Append(x.Name);
+                                        return
+                                            new EmbedFieldBuilder()
+                                                .WithName(builder.ToString())
+                                                .WithValue(x.Summary)
+                                                .WithIsInline(true);
+                                    })
                                     .ToList()
                         }
                             .WithTitle("利用可能コマンド")
