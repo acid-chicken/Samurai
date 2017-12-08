@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
+    using Assets;
+
+    [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase
     {
         [Command("help"), Summary("コマンドのヘルプを表示します。"), Alias("ヘルプ", "?")]
@@ -22,22 +26,31 @@ namespace AcidChicken.Samurai.Modules
                         {
                             Fields =
                                 ModuleManager.Service.Commands
-                                    .Select
-                                    (x =>
-                                        new EmbedFieldBuilder()
-                                            .WithName(x.Name)
-                                            .WithValue(x.Summary)
-                                            .WithIsInline(true)
-                                    )
+                                    .Select(x =>
+                                    {
+                                        var builder = new StringBuilder();
+                                        var module = x.Module;
+                                        while (!string.IsNullOrEmpty(module?.Name))
+                                        {
+                                            builder.Insert(0, $"{x.Module.Name} ");
+                                            module = module.Parent;
+                                        }
+                                        builder.Append(x.Name);
+                                        return
+                                            new EmbedFieldBuilder()
+                                                .WithName(builder.ToString())
+                                                .WithValue(x.Summary)
+                                                .WithIsInline(true);
+                                    })
                                     .ToList()
                         }
                             .WithTitle("利用可能コマンド")
                             .WithDescription("現在利用可能なコマンドを下記に列挙します。")
                             .WithCurrentTimestamp()
-                            .WithColor(Color.Blue)
+                            .WithColor(Colors.Blue)
                             .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
-                );
+                ).ConfigureAwait(false);
             }
             else
             {
@@ -56,10 +69,10 @@ namespace AcidChicken.Samurai.Modules
                                 .WithTitle(command.Name)
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
-                                .WithColor(Color.Green)
+                                .WithColor(Colors.Green)
                                 .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
-                    );
+                    ).ConfigureAwait(false);
                 }
             }
         }

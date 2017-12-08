@@ -47,7 +47,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithTitle("コマンドエラー")
                             .WithDescription(result.ErrorReason)
                             .WithCurrentTimestamp()
-                            .WithColor(Color.Red)
+                            .WithColor(Colors.Red)
                             .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(context.User)
                 );
