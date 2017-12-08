@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/bin/Debug/netcoreapp2.0/Samurai.dll",
+      "program": "${workspaceFolder}/Samurai/bin/Debug/netcoreapp2.0/Samurai.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
