@@ -8,6 +8,7 @@ using Discord.WebSocket;
 
 namespace AcidChicken.Samurai.Modules
 {
+    using static Program;
     using Assets;
 
     public static class ModuleManager
@@ -26,7 +27,7 @@ namespace AcidChicken.Samurai.Modules
 
         public static Task<IEnumerable<ModuleInfo>> InstallAsync()
         {
-            Program.DiscordClient.MessageReceived += HandleCommandAsync;
+            DiscordClient.MessageReceived += HandleCommandAsync;
             return Service.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
@@ -34,8 +35,8 @@ namespace AcidChicken.Samurai.Modules
         {
             var position = 0;
             var message = socketMessage as SocketUserMessage;
-            if (message == null || !((message.HasMentionPrefix(Program.DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position)))) return;
-            var context = new CommandContext(Program.DiscordClient, message);
+            if (message == null || !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position)))) return;
+            var context = new CommandContext(DiscordClient, message);
             var result = await Service.ExecuteAsync(context, position);
             if (!result.IsSuccess)
             {
@@ -48,7 +49,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription(result.ErrorReason)
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(context.User)
                 );
             }

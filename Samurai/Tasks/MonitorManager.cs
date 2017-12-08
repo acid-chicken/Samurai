@@ -10,6 +10,7 @@ using Discord.WebSocket;
 
 namespace AcidChicken.Samurai.Tasks
 {
+    using static Program;
     using Assets;
 
     public static class MonitorManager
@@ -30,9 +31,9 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token)
         {
-            Channel = (SocketTextChannel)Program.DiscordClient.GetChannel(Program.Config.MonitorChannel);
-            Targets = Targets.Union(Program.Config.Targets).ToDictionary(x => x.Key, x => x.Value);
-            foreach (var target in Program.Config.Targets)
+            Channel = (SocketTextChannel)DiscordClient.GetChannel(Config.MonitorChannel);
+            Targets = Targets.Union(Config.Targets).ToDictionary(x => x.Key, x => x.Value);
+            foreach (var target in Config.Targets)
             {
                 Targets.TryAdd(target.Key, target.Value);
             }
@@ -62,17 +63,17 @@ namespace AcidChicken.Samurai.Tasks
                                 .WithDescription($"{name}の状態が変化しました。")
                                 .WithCurrentTimestamp()
                                 .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
-                                .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                                 .AddInlineField("変化前", lastStatus)
                                 .AddInlineField("変化後", reply.Status)
                                 .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
                     ).ConfigureAwait(false);
                 }
-                await Program.LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
+                await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                await Program.LogAsync(new LogMessage(LogSeverity.Error, "MonitorManager", ex.Message, ex)).ConfigureAwait(false);
+                await LogAsync(new LogMessage(LogSeverity.Error, "MonitorManager", ex.Message, ex)).ConfigureAwait(false);
             }
         }
     }

@@ -8,6 +8,7 @@ using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
+    using static Program;
     using Assets;
     using Tasks;
 
@@ -19,7 +20,7 @@ namespace AcidChicken.Samurai.Modules
         {
             if (MonitorManager.AddMonitor(name, hostname))
             {
-                await Program.SaveConfigAsync(Program.Config).ConfigureAwait(false);
+                await SaveConfigAsync(Config).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -29,7 +30,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("モニターの追加に成功しました。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Green)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                             .AddInlineField("モニター名", name)
                             .AddInlineField("ホスト名", hostname)
@@ -46,7 +47,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("モニターの追加に失敗しました。既に同名のモニターが存在する可能性があります。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                             .AddInlineField("モニター名", name)
                             .AddInlineField("ホスト名", hostname)
@@ -59,7 +60,7 @@ namespace AcidChicken.Samurai.Modules
         {
             if (MonitorManager.DeleteMonitor(name))
             {
-                await Program.SaveConfigAsync(Program.Config).ConfigureAwait(false);
+                await SaveConfigAsync(Config).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -69,7 +70,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("モニターの削除に成功しました。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Green)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                             .AddInlineField("モニター名", name)
                 ).ConfigureAwait(false);
@@ -85,7 +86,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("モニターの削除に失敗しました。既にモニターが存在しない可能性があります。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                             .AddInlineField("モニター名", name)
                 ).ConfigureAwait(false);
@@ -118,7 +119,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("現在設定されているモニターを下記に列挙します。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Blue)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                 ).ConfigureAwait(false);
             }
@@ -135,7 +136,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithDescription("下記に情報を表示します。")
                                 .WithCurrentTimestamp()
                                 .WithColor(Colors.Blue)
-                                .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
                                 .AddInlineField("モニター名", name)
                                 .AddInlineField("ホスト名", hostname)
@@ -153,7 +154,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithDescription($"`{name}`に一致する名前のモニターが見つかりませんでした。誤字脱字や大文字小文字を確認して下さい。")
                                 .WithCurrentTimestamp()
                                 .WithColor(Colors.Red)
-                                .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
                     ).ConfigureAwait(false);
                 }
