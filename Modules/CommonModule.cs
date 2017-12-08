@@ -7,6 +7,8 @@ using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
+    using Assets;
+
     public class CommonModule : ModuleBase
     {
         [Command("help"), Summary("コマンドのヘルプを表示します。"), Alias("ヘルプ", "?")]
@@ -34,7 +36,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithTitle("利用可能コマンド")
                             .WithDescription("現在利用可能なコマンドを下記に列挙します。")
                             .WithCurrentTimestamp()
-                            .WithColor(Color.Blue)
+                            .WithColor(Colors.Blue)
                             .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                 );
@@ -56,7 +58,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithTitle(command.Name)
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
-                                .WithColor(Color.Green)
+                                .WithColor(Colors.Green)
                                 .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
                     );
