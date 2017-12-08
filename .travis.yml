@@ -2,8 +2,8 @@ language: csharp
 solution: Samurai.sln
 mono: none
 dotnet: 2.0.0
-dist: xenial
+dist: trusty
 install:
   - dotnet restore
 script:
-  - dotnet run
+  - dotnet build
