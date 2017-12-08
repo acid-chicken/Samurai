@@ -4,6 +4,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Title>Samurai</Title>
+    <Version>0.9</Version>
+    <Author>Acid Chicken</Author>
+    <Description>An Discord bot for BitZeny users.</Description>
+    <Copyright>Copyright (c) 2017 Acid Chicken (硫酸鶏)</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/acid-chicken/Samurai/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/acid-chicken/Samurai</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/acid-chicken/Samurai/master/Assets/Samurai.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/acid-chicken/Samurai.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -75,6 +76,26 @@ namespace AcidChicken.Samurai.Modules
                     ).ConfigureAwait(false);
                 }
             }
+        }
+
+        [Command("version"), Summary("バージョン情報を表示します。"), Alias("ver")]
+        public async Task VersionAsync()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            await ReplyAsync
+            (
+                message: Context.User.Mention,
+                embed:
+                    new EmbedBuilder()
+                        .WithTitle(((AssemblyTitleAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyTitleAttribute))).Title)
+                        .WithDescription(((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description)
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Blue)
+                        .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                        .WithAuthor(Context.User)
+                        .AddInlineField("バージョン", ((AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute))).InformationalVersion)
+                        .AddInlineField("著作権情報", ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute))).Copyright)
+            ).ConfigureAwait(false);
         }
     }
 }
