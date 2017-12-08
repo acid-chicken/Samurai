@@ -9,6 +9,7 @@ using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
+    using static Program;
     using Assets;
 
     [Group(""), Summary("汎用モジュールです。")]
@@ -49,7 +50,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("現在利用可能なコマンドを下記に列挙します。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Blue)
-                            .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                             .WithAuthor(Context.User)
                 ).ConfigureAwait(false);
             }
@@ -71,7 +72,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
                                 .WithColor(Colors.Green)
-                                .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                                 .WithAuthor(Context.User)
                     ).ConfigureAwait(false);
                 }
@@ -91,7 +92,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithDescription(((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description)
                         .WithCurrentTimestamp()
                         .WithColor(Colors.Blue)
-                        .WithFooter(Program.DiscordClient.CurrentUser.Username, Program.DiscordClient.CurrentUser.GetAvatarUrl())
+                        .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
                         .WithAuthor(Context.User)
                         .AddInlineField("バージョン", ((AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute))).InformationalVersion)
                         .AddInlineField("著作権情報", ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute))).Copyright)
