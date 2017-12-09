@@ -54,19 +54,35 @@ namespace AcidChicken.Samurai
 
         public static async Task<Config> LoadConfigAsync(string path = ConfigurePath)
         {
-            using (var stream = File.OpenRead(path))
-            using (var reader = new StreamReader(stream))
+            try
             {
-                return JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                using (var stream = File.OpenRead(path))
+                using (var reader = new StreamReader(stream))
+                {
+                    return JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                }
+            }
+            catch (Exception ex)
+            {
+                await LogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
+                throw;
             }
         }
 
         public static async Task SaveConfigAsync(Config config, string path = ConfigurePath)
         {
-            using (var stream = File.OpenWrite(path))
-            using (var writer = new StreamWriter(stream))
+            try
             {
-                await writer.WriteLineAsync(JsonConvert.SerializeObject(config, Formatting.Indented)).ConfigureAwait(false);
+                using (var stream = File.OpenWrite(path))
+                using (var writer = new StreamWriter(stream))
+                {
+                    await writer.WriteLineAsync(JsonConvert.SerializeObject(config, Formatting.Indented)).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                await LogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
+                throw;
             }
         }
 
