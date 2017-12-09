@@ -37,7 +37,7 @@ namespace AcidChicken.Samurai.Tasks
                 using (var response = request.Content)
                 {
                     Ticker = JsonConvert.DeserializeObject<Ticker[]>(await response.ReadAsStringAsync().ConfigureAwait(false))[0];
-                    var game = $"[{DateTimeOffset.FromUnixTimeSeconds(long.TryParse(Ticker.LastUpdated ?? "0", out long x) ? x : 0).ToLocalTime():M/d HH:mm}] {(double.TryParse(Ticker.PriceJpy ?? "0", out double y) ? y : 0):N3} JPY (hourly: {Ticker.PercentChangeOnehour}% / daily: {Ticker.PercentChangeTwentyfourhours}% / weekly: {Ticker.PercentChangeSevenDays}%)";
+                    var game = $"[{DateTimeOffset.FromUnixTimeSeconds(long.TryParse(Ticker.LastUpdated ?? "0", out long x) ? x : 0).ToLocalTime():M/d HH:mm}] {(double.TryParse(Ticker.PriceJpy ?? "0", out double y) ? y : 0):N3} JPY (hourly: {(Ticker.PercentChangeOnehour.StartsWith('-') || Ticker.PercentChangeOnehour == "0.00" ? "" : "+")}{Ticker.PercentChangeOnehour}% / daily: {(Ticker.PercentChangeTwentyfourhours.StartsWith('-') || Ticker.PercentChangeTwentyfourhours == "0.00" ? "" : "+")}{Ticker.PercentChangeTwentyfourhours}% / weekly: {(Ticker.PercentChangeSevenDays.StartsWith('-') || Ticker.PercentChangeSevenDays == "0.00" ? "" : "+")}{Ticker.PercentChangeSevenDays}%)";
                     await Task.WhenAll
                     (
                         DiscordClient.SetGameAsync(game),
