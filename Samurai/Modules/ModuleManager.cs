@@ -27,7 +27,7 @@ namespace AcidChicken.Samurai.Modules
 
         public static Task<IEnumerable<ModuleInfo>> InstallAsync()
         {
-            DiscordClient.MessageReceived += HandleCommandAsync;
+            DiscordClient.MessageReceived += (message) => Task.WhenAny(HandleCommandAsync(message), Task.Delay(0));
             return Service.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 

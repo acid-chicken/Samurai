@@ -41,9 +41,8 @@ namespace AcidChicken.Samurai
                 LogLevel = LogSeverity.Verbose
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
-            DiscordClient.Log += LogAsync;
-            DiscordClient.Ready += MonitorManager.WorkAsync;
-            DiscordClient.Ready += TickerManager.WorkAsync;
+            DiscordClient.Log += (message) => Task.WhenAny(LogAsync(message), Task.Delay(0));
+            DiscordClient.Ready += () => Task.WhenAny(MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 
