@@ -21,6 +21,12 @@ namespace AcidChicken.Samurai.Models
     [JsonObject]
     public class Monitor
     {
+        public Monitor(string hostname = "", IPStatus lastStatus = IPStatus.Unknown)
+        {
+            Hostname = hostname;
+            LastStatus = lastStatus;
+        }
+
         [JsonProperty("hostname")]
         public string Hostname { get; set; } = "";
 

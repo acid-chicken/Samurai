@@ -29,9 +29,9 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token)
         {
-            Channel = (SocketTextChannel)DiscordClient.GetChannel(Config.MonitorChannel);
-            Targets = Targets.Union(Config.Monitors.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.Hostname))).ToDictionary(x => x.Key, x => x.Value);
-            Statuses = Statuses.Union(Config.Monitors.Select(x => new KeyValuePair<string, IPStatus>(x.Key, x.Value.LastStatus))).ToDictionary(x => x.Key, x => x.Value);
+            Channel = (SocketTextChannel)DiscordClient.GetChannel(ApplicationConfig.MonitorChannel);
+            Targets = Targets.Union(ApplicationConfig.Monitors.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.Hostname))).ToDictionary(x => x.Key, x => x.Value);
+            Statuses = Statuses.Union(ApplicationConfig.Monitors.Select(x => new KeyValuePair<string, IPStatus>(x.Key, x.Value.LastStatus))).ToDictionary(x => x.Key, x => x.Value);
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll

@@ -16,7 +16,7 @@ namespace AcidChicken.Samurai
     {
         public const string ConfigurePath = "config.json";
 
-        public static Config Config { get; set; }
+        public static Config ApplicationConfig { get; set; }
 
         public static DiscordSocketClient DiscordClient { get; set; }
 
@@ -30,7 +30,7 @@ namespace AcidChicken.Samurai
         {
             if (File.Exists(ConfigurePath))
             {
-                Config = await LoadConfigAsync().ConfigureAwait(false);
+                ApplicationConfig = await LoadConfigAsync().ConfigureAwait(false);
             }
             else
             {
@@ -48,7 +48,7 @@ namespace AcidChicken.Samurai
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 
-            await DiscordClient.LoginAsync(TokenType.Bot, Config.DiscordToken).ConfigureAwait(false);
+            await DiscordClient.LoginAsync(TokenType.Bot, ApplicationConfig.DiscordToken).ConfigureAwait(false);
             await DiscordClient.StartAsync().ConfigureAwait(false);
 
             await Task.Delay(-1).ConfigureAwait(false);
