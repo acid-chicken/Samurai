@@ -10,6 +10,7 @@ namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;
+    using Components;
     using Models;
     using Tasks;
 
@@ -36,6 +37,23 @@ namespace AcidChicken.Samurai.Modules
                             .AddInlineField("モニター名", name)
                             .AddInlineField("ホスト名", hostname)
                 ).ConfigureAwait(false);
+                NotificationManager.Channels.Select
+                (async x =>
+                    await x.SendMessageAsync
+                    (
+                        text: Context.User.Mention,
+                        embed:
+                            new EmbedBuilder()
+                                .WithTitle("モニター追加")
+                                .WithDescription($"{Context.User.Username}#{Context.User.Discriminator}がモニターを追加しました。")
+                                .WithCurrentTimestamp()
+                                .WithColor(Colors.Blue)
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithAuthor(Context.User)
+                                .AddInlineField("モニター名", name)
+                                .AddInlineField("ホスト名", hostname)
+                    ).ConfigureAwait(false)
+                );
             }
             else
             {
@@ -75,6 +93,22 @@ namespace AcidChicken.Samurai.Modules
                             .WithAuthor(Context.User)
                             .AddInlineField("モニター名", name)
                 ).ConfigureAwait(false);
+                NotificationManager.Channels.Select
+                (async x =>
+                    await x.SendMessageAsync
+                    (
+                        text: Context.User.Mention,
+                        embed:
+                            new EmbedBuilder()
+                                .WithTitle("モニター削除")
+                                .WithDescription($"{Context.User.Username}#{Context.User.Discriminator}がモニターを削除しました。")
+                                .WithCurrentTimestamp()
+                                .WithColor(Colors.Blue)
+                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithAuthor(Context.User)
+                                .AddInlineField("モニター名", name)
+                    ).ConfigureAwait(false)
+                );
             }
             else
             {
