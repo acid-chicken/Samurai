@@ -18,7 +18,7 @@ namespace AcidChicken.Samurai.Modules
         [Command("add"), Summary("モニターを追加します。"), Alias("create", "+")]
         public async Task AddAsync([Summary("モニターの名前")] string name, [Remainder, Summary("モニターのホスト名")] string hostname)
         {
-            if (MonitorManager.AddMonitor(name, hostname))
+            if (MonitorManager.AddMonitor(name, hostname) && Config.Targets.TryAdd(name, hostname))
             {
                 await SaveConfigAsync(Config).ConfigureAwait(false);
                 await ReplyAsync
@@ -58,7 +58,7 @@ namespace AcidChicken.Samurai.Modules
         [Command("delete"), Summary("モニターを削除します。"), Alias("remove", "-")]
         public async Task DeleteAsync([Remainder, Summary("削除するモニター")] string name)
         {
-            if (MonitorManager.DeleteMonitor(name))
+            if (MonitorManager.DeleteMonitor(name) && Config.Targets.Remove(name))
             {
                 await SaveConfigAsync(Config).ConfigureAwait(false);
                 await ReplyAsync
