@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Models
@@ -14,6 +15,16 @@ namespace AcidChicken.Samurai.Models
         public ulong MonitorChannel { get; set; } = 0;
 
         [JsonProperty("targets")]
-        public Dictionary<string, string> Targets { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, Monitor> Monitors { get; set; } = new Dictionary<string, Monitor>();
+    }
+
+    [JsonObject]
+    public class Monitor
+    {
+        [JsonProperty("hostname")]
+        public string Hostname { get; set; } = "";
+
+        [JsonProperty("last_status")]
+        public IPStatus LastStatus { get; set; } = IPStatus.Unknown;
     }
 }
