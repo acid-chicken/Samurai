@@ -10,6 +10,7 @@ namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;
+    using Models;
     using Tasks;
 
     [Group("monitor"), Summary("モニターを管理します。"), Alias("m")]
@@ -18,9 +19,9 @@ namespace AcidChicken.Samurai.Modules
         [Command("add"), Summary("モニターを追加します。"), Alias("create", "+")]
         public async Task AddAsync([Summary("モニターの名前")] string name, [Remainder, Summary("モニターのホスト名")] string hostname)
         {
-            if (MonitorManager.AddMonitor(name, hostname) && Config.Targets.TryAdd(name, hostname))
+            if (MonitorManager.AddMonitor(name, hostname) && ApplicationConfig.Monitors.TryAdd(name, new Monitor(hostname)))
             {
-                await SaveConfigAsync(Config).ConfigureAwait(false);
+                await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -58,9 +59,9 @@ namespace AcidChicken.Samurai.Modules
         [Command("delete"), Summary("モニターを削除します。"), Alias("remove", "-")]
         public async Task DeleteAsync([Remainder, Summary("削除するモニター")] string name)
         {
-            if (MonitorManager.DeleteMonitor(name) && Config.Targets.Remove(name))
+            if (MonitorManager.DeleteMonitor(name) && ApplicationConfig.Monitors.Remove(name))
             {
-                await SaveConfigAsync(Config).ConfigureAwait(false);
+                await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
