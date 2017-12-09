@@ -24,6 +24,8 @@ namespace AcidChicken.Samurai
 
         public static HttpClient HttpClient { get; set; } = new HttpClient();
 
+        public static bool IsLoggerLocked { get; private set; }
+
         public static async Task Main(string[] args)
         {
             if (File.Exists(ConfigurePath))
@@ -41,7 +43,7 @@ namespace AcidChicken.Samurai
                 LogLevel = LogSeverity.Verbose
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
-            DiscordClient.Log += (message) => Task.WhenAny(LogAsync(message), Task.Delay(0));
+            DiscordClient.Log += RequestLogAsync;
             DiscordClient.Ready += () => Task.WhenAny(MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
@@ -60,13 +62,13 @@ namespace AcidChicken.Samurai
                 using (var reader = new StreamReader(stream))
                 {
                     var result = JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
-                    await LogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
                     return result;
                 }
             }
             catch (Exception ex)
             {
-                await LogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
+                await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
         }
@@ -79,18 +81,23 @@ namespace AcidChicken.Samurai
                 using (var writer = new StreamWriter(stream))
                 {
                     await writer.WriteLineAsync(JsonConvert.SerializeObject(config, Formatting.Indented)).ConfigureAwait(false);
-                    await LogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
-                await LogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
+                await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
         }
 
         public static async Task LogAsync(LogMessage message)
         {
+            while (IsLoggerLocked)
+            {
+                await Task.Delay(1).ConfigureAwait(false);
+            }
+            IsLoggerLocked = true;
             switch (message.Severity)
             {
                 case LogSeverity.Critical:
@@ -112,8 +119,18 @@ namespace AcidChicken.Samurai
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     break;
             }
-            await Console.Out.WriteLineAsync($"[{message.Source}]{message.Message}");
+            await Console.Out.WriteLineAsync($"[{message.Source}]{message.Message}").ConfigureAwait(false);
             Console.ResetColor();
+            IsLoggerLocked = false;
+        }
+
+        public static async Task RequestLogAsync(LogMessage message)
+        {
+            await Task.WhenAny
+            (
+                LogAsync(message),
+                Task.Delay(0)
+            ).ConfigureAwait(false);
         }
     }
 }

@@ -39,6 +39,7 @@ namespace AcidChicken.Samurai.Tasks
             {
                 await Task.WhenAll
                 (
+                    RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", "Calling tasks.")),
                     Task.WhenAll(Statuses.Select(x => SendStatusChangeAsync(x.Key, x.Value))),
                     Task.Delay(60000)
                 ).ConfigureAwait(false);
@@ -54,30 +55,33 @@ namespace AcidChicken.Samurai.Tasks
                 Statuses[name] = reply.Status;
                 if (reply.Status != lastStatus)
                 {
-                    await Channel.SendMessageAsync
+                    await Task.WhenAll
                     (
-                        text: "",
-                        embed:
-                            new EmbedBuilder()
-                                .WithTitle("状態変化")
-                                .WithDescription($"{name}の状態が変化しました。")
-                                .WithCurrentTimestamp()
-                                .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
-                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
-                                .AddInlineField("変化前", lastStatus)
-                                .AddInlineField("変化後", reply.Status)
-                                .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
+                        Channel.SendMessageAsync
+                        (
+                            text: "",
+                            embed:
+                                new EmbedBuilder()
+                                    .WithTitle("状態変化")
+                                    .WithDescription($"{name}の状態が変化しました。")
+                                    .WithCurrentTimestamp()
+                                    .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
+                                    .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                    .AddInlineField("変化前", lastStatus)
+                                    .AddInlineField("変化後", reply.Status)
+                                    .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
+                        ),
+                        RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})"))
                     ).ConfigureAwait(false);
-                    await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
                 }
                 else
                 {
-                    await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
-                await LogAsync(new LogMessage(LogSeverity.Error, "MonitorManager", ex.Message, ex)).ConfigureAwait(false);
+                await RequestLogAsync(new LogMessage(LogSeverity.Error, "MonitorManager", ex.Message, ex)).ConfigureAwait(false);
             }
         }
     }

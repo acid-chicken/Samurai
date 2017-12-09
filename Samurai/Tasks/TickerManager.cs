@@ -37,13 +37,16 @@ namespace AcidChicken.Samurai.Tasks
                 {
                     Ticker = JsonConvert.DeserializeObject<Ticker[]>(await response.ReadAsStringAsync().ConfigureAwait(false))[0];
                     var game = $"[{DateTimeOffset.FromUnixTimeSeconds(long.TryParse(Ticker.LastUpdated ?? "0", out long x) ? x : 0).ToLocalTime():M/d HH:mm}] {(double.TryParse(Ticker.PriceJpy ?? "0", out double y) ? y : 0):N3} JPY (hourly: {Ticker.PercentChangeOnehour}% / daily: {Ticker.PercentChangeTwentyfourhours}% / weekly: {Ticker.PercentChangeSevenDays}%)";
-                    await DiscordClient.SetGameAsync(game).ConfigureAwait(false);
-                    await LogAsync(new LogMessage(LogSeverity.Verbose, "TickerManager", $"Set game to \"{game}\".")).ConfigureAwait(false);
+                    await Task.WhenAll
+                    (
+                        DiscordClient.SetGameAsync(game),
+                        RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TickerManager", $"Set game to \"{game}\"."))
+                    ).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
             {
-                await LogAsync(new LogMessage(LogSeverity.Error, "TickerManager", ex.Message, ex)).ConfigureAwait(false);
+                await RequestLogAsync(new LogMessage(LogSeverity.Error, "TickerManager", ex.Message, ex)).ConfigureAwait(false);
             }
         }
     }
