@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai
 {
+    using Components;
     using Models;
     using Modules;
     using Tasks;
@@ -44,7 +45,7 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += RequestLogAsync;
-            DiscordClient.Ready += () => Task.WhenAny(MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
+            DiscordClient.Ready += () => Task.WhenAny(NotificationManager.InitAsync(), MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 

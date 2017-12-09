@@ -11,8 +11,8 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("discord_token")]
         public string DiscordToken { get; set; } = "";
 
-        [JsonProperty("monitor_channel")]
-        public ulong MonitorChannel { get; set; } = 0;
+        [JsonProperty("notification_channels")]
+        public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
         [JsonProperty("targets")]
         public Dictionary<string, Monitor> Monitors { get; set; } = new Dictionary<string, Monitor>();

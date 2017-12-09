@@ -94,7 +94,7 @@ namespace AcidChicken.Samurai.Modules
             }
         }
 
-        [Command("information"), Summary("モニターの情報を表示します。"), Alias("info", "lookup")]
+        [Command("information"), Summary("モニターの情報を表示します。"), Alias("info", "show", "lookup")]
         public async Task InformationAsync([Remainder, Summary("対象のモニター")] string name = null)
         {
             if (string.IsNullOrEmpty(name))

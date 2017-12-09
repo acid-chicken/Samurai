@@ -12,11 +12,10 @@ namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
     using Assets;
+    using Components;
 
     public static class MonitorManager
     {
-        public static SocketTextChannel Channel { get; set; }
-
         public static Dictionary<string, IPStatus> Statuses { get; set; } = new Dictionary<string, IPStatus>();
 
         public static Dictionary<string, string> Targets { get; set; } = new Dictionary<string, string>();
@@ -29,7 +28,6 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token)
         {
-            Channel = (SocketTextChannel)DiscordClient.GetChannel(ApplicationConfig.MonitorChannel);
             Targets = Targets.Union(ApplicationConfig.Monitors.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.Hostname))).ToDictionary(x => x.Key, x => x.Value);
             Statuses = Statuses.Union(ApplicationConfig.Monitors.Select(x => new KeyValuePair<string, IPStatus>(x.Key, x.Value.LastStatus))).ToDictionary(x => x.Key, x => x.Value);
             while (!token.IsCancellationRequested)
@@ -57,24 +55,28 @@ namespace AcidChicken.Samurai.Tasks
                 }
                 else
                 {
-                    await Task.WhenAll
-                    (
-                        Channel.SendMessageAsync
-                        (
-                            text: "",
-                            embed:
-                                new EmbedBuilder()
-                                    .WithTitle("状態変化")
-                                    .WithDescription($"{name}の状態が変化しました。")
-                                    .WithCurrentTimestamp()
-                                    .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
-                                    .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
-                                    .AddInlineField("変化前", lastStatus)
-                                    .AddInlineField("変化後", reply.Status)
-                                    .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
-                        ),
-                        RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})"))
-                    ).ConfigureAwait(false);
+                    NotificationManager.Channels
+                        .Select
+                        (async x =>
+                            await Task.WhenAll
+                            (
+                                x.SendMessageAsync
+                                (
+                                    text: "",
+                                    embed:
+                                        new EmbedBuilder()
+                                            .WithTitle("状態変化")
+                                            .WithDescription($"{name}の状態が変化しました。")
+                                            .WithCurrentTimestamp()
+                                            .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
+                                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                            .AddInlineField("変化前", lastStatus)
+                                            .AddInlineField("変化後", reply.Status)
+                                            .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
+                                ),
+                                RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})"))
+                            ).ConfigureAwait(false)
+                        );
                 }
             }
             catch (Exception ex)
