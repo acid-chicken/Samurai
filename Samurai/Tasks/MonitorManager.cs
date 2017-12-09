@@ -53,7 +53,7 @@ namespace AcidChicken.Samurai.Tasks
                 Statuses[name] = reply.Status;
                 if (reply.Status == lastStatus)
                 {
-                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]}) status is still the same: {reply.Status}")).ConfigureAwait(false);
                 }
                 else
                 {
