@@ -59,7 +59,9 @@ namespace AcidChicken.Samurai
                 using (var stream = File.OpenRead(path))
                 using (var reader = new StreamReader(stream))
                 {
-                    return JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                    var result = JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                    await LogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
+                    return result;
                 }
             }
             catch (Exception ex)
@@ -77,6 +79,7 @@ namespace AcidChicken.Samurai
                 using (var writer = new StreamWriter(stream))
                 {
                     await writer.WriteLineAsync(JsonConvert.SerializeObject(config, Formatting.Indented)).ConfigureAwait(false);
+                    await LogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
