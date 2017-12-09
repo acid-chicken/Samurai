@@ -51,7 +51,8 @@ namespace AcidChicken.Samurai.Tasks
             {
                 var ping = new Ping();
                 var reply = await ping.SendPingAsync(Targets[name], 60000).ConfigureAwait(false);
-                if (reply.Status == lastStatus)
+                Statuses[name] = reply.Status;
+                if (reply.Status != lastStatus)
                 {
                     await Channel.SendMessageAsync
                     (
@@ -67,8 +68,8 @@ namespace AcidChicken.Samurai.Tasks
                                 .AddInlineField("変化後", reply.Status)
                                 .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
                     ).ConfigureAwait(false);
+                    await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
                 }
-                await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
