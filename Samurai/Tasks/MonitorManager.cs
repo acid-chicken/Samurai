@@ -51,7 +51,7 @@ namespace AcidChicken.Samurai.Tasks
             try
             {
                 var ping = new Ping();
-                var reply = await ping.SendPingAsync(Targets[name], 60000).ConfigureAwait(false);
+                var reply = await ping.SendPingAsync(Targets[name]).ConfigureAwait(false);
                 Statuses[name] = reply.Status;
                 if (reply.Status != lastStatus)
                 {
