@@ -22,6 +22,7 @@ namespace AcidChicken.Samurai.Tasks
             {
                 await Task.WhenAll
                 (
+                    RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TickerManager", "Calling tasks.")),
                     SetGameAsTickerAsync(),
                     Task.Delay(60000)
                 ).ConfigureAwait(false);
