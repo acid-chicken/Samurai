@@ -70,6 +70,10 @@ namespace AcidChicken.Samurai.Tasks
                     ).ConfigureAwait(false);
                     await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})")).ConfigureAwait(false);
                 }
+                else
+                {
+                    await LogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
