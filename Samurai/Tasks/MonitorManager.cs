@@ -17,8 +17,6 @@ namespace AcidChicken.Samurai.Tasks
     {
         public static SocketTextChannel Channel { get; set; }
 
-        public static Ping Ping { get; set; } = new Ping();
-
         public static Dictionary<string, IPStatus> Statuses { get; set; } = new Dictionary<string, IPStatus>();
 
         public static Dictionary<string, string> Targets { get; set; } = new Dictionary<string, string>();
@@ -51,7 +49,8 @@ namespace AcidChicken.Samurai.Tasks
         {
             try
             {
-                var reply = await Ping.SendPingAsync(Targets[name], 60000).ConfigureAwait(false);
+                var ping = new Ping();
+                var reply = await ping.SendPingAsync(Targets[name], 60000).ConfigureAwait(false);
                 if (reply.Status == lastStatus)
                 {
                     await Channel.SendMessageAsync
