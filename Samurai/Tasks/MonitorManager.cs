@@ -31,10 +31,7 @@ namespace AcidChicken.Samurai.Tasks
         {
             Channel = (SocketTextChannel)DiscordClient.GetChannel(Config.MonitorChannel);
             Targets = Targets.Union(Config.Targets).ToDictionary(x => x.Key, x => x.Value);
-            foreach (var target in Config.Targets)
-            {
-                Targets.TryAdd(target.Key, target.Value);
-            }
+            Statuses = Statuses.Union(Config.Targets.Select(x => new KeyValuePair<string, IPStatus>(x.Key, IPStatus.Unknown))).ToDictionary(x => x.Key, x => x.Value);
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll
@@ -50,10 +47,15 @@ namespace AcidChicken.Samurai.Tasks
         {
             try
             {
+                await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"Begining ping to \"{name}\".")).ConfigureAwait(false);
                 var ping = new Ping();
                 var reply = await ping.SendPingAsync(Targets[name]).ConfigureAwait(false);
                 Statuses[name] = reply.Status;
-                if (reply.Status != lastStatus)
+                if (reply.Status == lastStatus)
+                {
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
+                }
+                else
                 {
                     await Task.WhenAll
                     (
@@ -73,10 +75,6 @@ namespace AcidChicken.Samurai.Tasks
                         ),
                         RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is updated from {lastStatus} to {reply.Status})"))
                     ).ConfigureAwait(false);
-                }
-                else
-                {
-                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
