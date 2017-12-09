@@ -30,8 +30,8 @@ namespace AcidChicken.Samurai.Tasks
         public static async Task WorkAsync(CancellationToken token)
         {
             Channel = (SocketTextChannel)DiscordClient.GetChannel(Config.MonitorChannel);
-            Targets = Targets.Union(Config.Targets).ToDictionary(x => x.Key, x => x.Value);
-            Statuses = Statuses.Union(Config.Targets.Select(x => new KeyValuePair<string, IPStatus>(x.Key, IPStatus.Unknown))).ToDictionary(x => x.Key, x => x.Value);
+            Targets = Targets.Union(Config.Monitors.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.Hostname))).ToDictionary(x => x.Key, x => x.Value);
+            Statuses = Statuses.Union(Config.Monitors.Select(x => new KeyValuePair<string, IPStatus>(x.Key, x.Value.LastStatus))).ToDictionary(x => x.Key, x => x.Value);
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll
@@ -53,7 +53,7 @@ namespace AcidChicken.Samurai.Tasks
                 Statuses[name] = reply.Status;
                 if (reply.Status == lastStatus)
                 {
-                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]} status is still the same: {reply.Status})")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "MonitorManager", $"{name}({Targets[name]}) status is still the same: {reply.Status}")).ConfigureAwait(false);
                 }
                 else
                 {
