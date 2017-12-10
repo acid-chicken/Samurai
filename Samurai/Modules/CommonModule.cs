@@ -12,7 +12,7 @@ namespace AcidChicken.Samurai.Modules
     using static Program;
     using Assets;
 
-    [Group, Summary("汎用モジュールです。")]
+    [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase
     {
         [Command("help"), Summary("コマンドのヘルプを表示します。"), Alias("ヘルプ", "?")]

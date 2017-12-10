@@ -16,7 +16,7 @@ namespace AcidChicken.Samurai.Modules
         public static string UnitedStatesDollar = "USD";
         public static string[] Convertable = new [] { "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "CZK", "DKK", "EUR", "GBP", "HKD", "HUF", "IDR", "ILS", "INR", "JPY", "KRW", "MXN", "MYR", "NOK", "NZD", "PHP", "PKR", "PLN", "RUB", "SEK", "SGD", "THB", "TRY", "TWD", "ZAR" };
 
-        [Command, Summary("現在のレートで通貨を換算します。")]
+        [Command(""), Summary("現在のレートで通貨を換算します。")]
         public async Task ConvertAsync([Summary("換算元の通貨")] string before, [Summary("換算先の通貨")] string after, [Summary("換算額")] decimal volume)
         {
             var result = volume;
