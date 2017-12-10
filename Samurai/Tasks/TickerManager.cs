@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
+    using Components;
     using Models;
 
     public static class TickerManager
@@ -33,17 +34,13 @@ namespace AcidChicken.Samurai.Tasks
         {
             try
             {
-                using (var request = await HttpClient.GetAsync("https://api.coinmarketcap.com/v1/ticker/bitzeny/?convert=JPY").ConfigureAwait(false))
-                using (var response = request.Content)
-                {
-                    Ticker = JsonConvert.DeserializeObject<Ticker[]>(await response.ReadAsStringAsync().ConfigureAwait(false))[0];
-                    var game = $"[{DateTimeOffset.FromUnixTimeSeconds(long.TryParse(Ticker.LastUpdated ?? "0", out long x) ? x : 0).ToLocalTime():M/d HH:mm}] {(double.TryParse(Ticker.PriceJpy ?? "0", out double y) ? y : 0):N3} JPY (hourly: {(Ticker.PercentChangeOnehour.StartsWith('-') || Ticker.PercentChangeOnehour == "0.00" ? "" : "+")}{Ticker.PercentChangeOnehour}% / daily: {(Ticker.PercentChangeTwentyfourhours.StartsWith('-') || Ticker.PercentChangeTwentyfourhours == "0.00" ? "" : "+")}{Ticker.PercentChangeTwentyfourhours}% / weekly: {(Ticker.PercentChangeSevenDays.StartsWith('-') || Ticker.PercentChangeSevenDays == "0.00" ? "" : "+")}{Ticker.PercentChangeSevenDays}%)";
-                    await Task.WhenAll
-                    (
-                        DiscordClient.SetGameAsync(game),
-                        RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TickerManager", $"Set game to \"{game}\"."))
-                    ).ConfigureAwait(false);
-                }
+                Ticker = await ApiManager.GetTickerAsync("bitzeny", "JPY").ConfigureAwait(false);
+                var game = $"[{DateTimeOffset.FromUnixTimeSeconds(long.TryParse(Ticker.LastUpdated ?? "0", out long x) ? x : 0).ToLocalTime():M/d HH:mm}] {(double.TryParse(Ticker.PriceJpy ?? "0", out double y) ? y : 0):N3} JPY (hourly: {(Ticker.PercentChangeOnehour.StartsWith('-') || Ticker.PercentChangeOnehour == "0.00" ? "" : "+")}{Ticker.PercentChangeOnehour}% / daily: {(Ticker.PercentChangeTwentyfourhours.StartsWith('-') || Ticker.PercentChangeTwentyfourhours == "0.00" ? "" : "+")}{Ticker.PercentChangeTwentyfourhours}% / weekly: {(Ticker.PercentChangeSevenDays.StartsWith('-') || Ticker.PercentChangeSevenDays == "0.00" ? "" : "+")}{Ticker.PercentChangeSevenDays}%)";
+                await Task.WhenAll
+                (
+                    DiscordClient.SetGameAsync(game),
+                    RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TickerManager", $"Set game to \"{game}\"."))
+                ).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
