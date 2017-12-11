@@ -16,6 +16,7 @@ dotnet_csproj:
   file_version: '{version}'
   informational_version: '{version}'
 before_build:
+  - git submodule update --init --recursive
   - nuget restore
 build:
   parallel: true
