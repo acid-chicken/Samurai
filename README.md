@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 <div align="center">
   <img src="assets/Samurai.png" alt="Samurai Logo" height="256">
   <h1>Samurai</h1>
@@ -40,6 +41,17 @@
 <dl>
   <dt><a href="https://github.com/RogueException/Discord.Net">RougeException/Discord.Net</a></dt>
   <dd><a href="https://github.com/RogueException/Discord.Net/blob/dev/LICENSE">MIT License</a></dd>
+</dl>
+<dl>
+  <dt><a href="https://github.com/acid-chicken/Rollbar.NET">acid-chicken/Rollbar.NET</a></dt>
+  <dd>
+    <a href="https://github.com/acid-chicken/Rollbar.NET/blob/master/LICENSE">MIT License</a>
+    <p>forked from this repository</p>
+    <dl>
+      <dt><a href="https://github.com/rollbar/Rollbar.NET">rollbar/Rollbar.NET</a></dt>
+      <dd><a href="https://github.com/rollbar/Rollbar.NET/blob/master/LICENSE">MIT License</a></dd>
+    </dl>
+  </dd>
 </dl>
 
 ## Donation
