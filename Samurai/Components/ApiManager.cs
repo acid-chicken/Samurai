@@ -30,7 +30,7 @@ namespace AcidChicken.Samurai.Components
 
         public static async Task<Ticker[]> GetTickersAsync(string convert = null)
         {
-            using (var request = await HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/{(string.IsNullOrEmpty(convert) ? "" : $"?convert={convert}")}").ConfigureAwait(false))
+            using (var request = await HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/?limit=0{(string.IsNullOrEmpty(convert) ? "" : $"&convert={convert}")}").ConfigureAwait(false))
             using (var response = request.Content)
             {
                 return JsonConvert.DeserializeObject<Ticker[]>(await response.ReadAsStringAsync().ConfigureAwait(false));
@@ -39,7 +39,7 @@ namespace AcidChicken.Samurai.Components
 
         public static async Task<Dictionary<string, string>[]> GetTickersAsDictionaryAsync(string convert = null)
         {
-            using (var request = await HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/{(string.IsNullOrEmpty(convert) ? "" : $"?convert={convert}")}").ConfigureAwait(false))
+            using (var request = await HttpClient.GetAsync($"https://api.coinmarketcap.com/v1/ticker/?limit=0{(string.IsNullOrEmpty(convert) ? "" : $"&convert={convert}")}").ConfigureAwait(false))
             using (var response = request.Content)
             {
                 return JsonConvert.DeserializeObject<Dictionary<string, string>[]>(await response.ReadAsStringAsync().ConfigureAwait(false));
