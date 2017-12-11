@@ -10,6 +10,7 @@ namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;
+    using Components;
 
     public static class ModuleManager
     {
@@ -49,7 +50,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription(result.ErrorReason)
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
-                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(EmbedManager.CurrentFooter)
                             .WithAuthor(context.User)
                 );
             }

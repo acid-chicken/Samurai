@@ -69,7 +69,7 @@ namespace AcidChicken.Samurai.Tasks
                                             .WithDescription($"{name}の状態が変化しました。")
                                             .WithCurrentTimestamp()
                                             .WithColor(reply.Status == IPStatus.Success ? Colors.Green : Colors.Red)
-                                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                            .WithFooter(EmbedManager.CurrentFooter)
                                             .AddInlineField("変化前", lastStatus)
                                             .AddInlineField("変化後", reply.Status)
                                             .AddInlineField("応答速度", $"{reply.RoundtripTime:#,0}ms")
