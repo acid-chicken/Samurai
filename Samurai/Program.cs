@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using Rollbar = RollbarDotNet; // It has namespace conflicts.
+// using Rollbar = RollbarDotNet; // It has namespace conflicts.
 
 namespace AcidChicken.Samurai
 {
@@ -40,10 +40,10 @@ namespace AcidChicken.Samurai
                 return;
             }
 
-            Rollbar.Rollbar.Init(new Rollbar.RollbarConfig(ApplicationConfig.RollbarConfig)
-            {
-                Environment = ApplicationConfig.RollbarEnvironment
-            });
+            // Rollbar.Rollbar.Init(new Rollbar.RollbarConfig(ApplicationConfig.RollbarConfig)
+            // {
+            //     Environment = ApplicationConfig.RollbarEnvironment
+            // });
             DiscordClientConfig = new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Verbose
@@ -104,44 +104,44 @@ namespace AcidChicken.Samurai
                 await Task.Delay(1).ConfigureAwait(false);
             }
             IsLoggerLocked = true;
-            var errorLevel = Rollbar.ErrorLevel.Debug;
+            // var errorLevel = Rollbar.ErrorLevel.Debug;
             switch (message.Severity)
             {
                 case LogSeverity.Critical:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    errorLevel = Rollbar.ErrorLevel.Critical;
+                    // errorLevel = Rollbar.ErrorLevel.Critical;
                     break;
                 case LogSeverity.Error:
                     Console.ForegroundColor = ConsoleColor.Red;
-                    errorLevel = Rollbar.ErrorLevel.Error;
+                    // errorLevel = Rollbar.ErrorLevel.Error;
                     break;
                 case LogSeverity.Warning:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    errorLevel = Rollbar.ErrorLevel.Warning;
+                    // errorLevel = Rollbar.ErrorLevel.Warning;
                     break;
                 case LogSeverity.Info:
                     Console.ForegroundColor = ConsoleColor.Green;
-                    errorLevel = Rollbar.ErrorLevel.Info;
+                    // errorLevel = Rollbar.ErrorLevel.Info;
                     break;
                 case LogSeverity.Verbose:
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    errorLevel = Rollbar.ErrorLevel.Debug;
+                    // errorLevel = Rollbar.ErrorLevel.Debug;
                     break;
                 case LogSeverity.Debug:
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    errorLevel = Rollbar.ErrorLevel.Debug;
+                    // errorLevel = Rollbar.ErrorLevel.Debug;
                     break;
             }
-            var guid = Guid.Empty;
-            if (message.Exception == null)
-            {
-                guid = Rollbar.Rollbar.Report(message.Message, errorLevel) ?? Guid.Empty;
-            }
-            else
-            {
-                guid = Rollbar.Rollbar.Report(message.Exception, errorLevel) ?? Guid.Empty;
-            }
-            await Console.Out.WriteLineAsync($"[{guid}]{message.Source}:{message.Message}").ConfigureAwait(false);
+            // var guid = Guid.Empty;
+            // if (message.Exception == null)
+            // {
+            //     guid = Rollbar.Rollbar.Report(message.Message, errorLevel) ?? Guid.Empty;
+            // }
+            // else
+            // {
+            //     guid = Rollbar.Rollbar.Report(message.Exception, errorLevel) ?? Guid.Empty;
+            // }
+            await Console.Out.WriteLineAsync($"[{message.Source}]{message.Message}").ConfigureAwait(false);
             Console.ResetColor();
             IsLoggerLocked = false;
         }

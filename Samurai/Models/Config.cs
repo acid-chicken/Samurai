@@ -14,11 +14,11 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("notification_channels")]
         public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
-        [JsonProperty("rollbar_environment")]
-        public string RollbarEnvironment { get; set; } = "production";
+        // [JsonProperty("rollbar_environment")]
+        // public string RollbarEnvironment { get; set; } = "production";
 
-        [JsonProperty("rollbar_token")]
-        public string RollbarConfig { get; set; } = "";
+        // [JsonProperty("rollbar_token")]
+        // public string RollbarConfig { get; set; } = "";
 
         [JsonProperty("targets")]
         public Dictionary<string, Monitor> Monitors { get; set; } = new Dictionary<string, Monitor>();
