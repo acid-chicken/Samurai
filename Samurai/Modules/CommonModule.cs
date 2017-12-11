@@ -11,6 +11,7 @@ namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;
+    using Components;
 
     [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase
@@ -50,7 +51,7 @@ namespace AcidChicken.Samurai.Modules
                             .WithDescription("現在利用可能なコマンドを下記に列挙します。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Blue)
-                            .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                            .WithFooter(EmbedManager.CurrentFooter)
                             .WithAuthor(Context.User)
                 ).ConfigureAwait(false);
             }
@@ -72,7 +73,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
                                 .WithColor(Colors.Green)
-                                .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                                .WithFooter(EmbedManager.CurrentFooter)
                                 .WithAuthor(Context.User)
                     ).ConfigureAwait(false);
                 }
@@ -92,7 +93,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithDescription(((AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute))).Description)
                         .WithCurrentTimestamp()
                         .WithColor(Colors.Blue)
-                        .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                        .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
                         .AddInlineField("バージョン", ((AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute))).InformationalVersion)
                         .AddInlineField("著作権情報", ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute))).Copyright)

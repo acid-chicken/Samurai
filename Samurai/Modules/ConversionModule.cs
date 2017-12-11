@@ -107,7 +107,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithDescription(route)
                         .WithCurrentTimestamp()
                         .WithColor(Colors.Blue)
-                        .WithFooter(DiscordClient.CurrentUser.Username, DiscordClient.CurrentUser.GetAvatarUrl())
+                        .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
                         .AddInlineField("換算前", $"{volume} {before}")
                         .AddInlineField("換算後", $"{result} {after}")
