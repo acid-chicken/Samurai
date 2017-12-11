@@ -4,6 +4,7 @@ mono: none
 dotnet: 2.0.0
 dist: trusty
 install:
+  - git submodule update --init --recursive
   - dotnet restore
 script:
   - dotnet build
