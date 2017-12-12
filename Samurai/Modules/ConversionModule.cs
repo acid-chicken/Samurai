@@ -91,17 +91,17 @@ namespace AcidChicken.Samurai.Modules
                 }
                 else
                 {
-                    var beforeDs = await ApiManager.GetTickersAsDictionaryAsync().ConfigureAwait(false);
-                    var beforeBD = beforeDs.First(x => x["id"] == afterL || x["name"] == after || x["symbol"] == afterU);
+                    var afterDs = await ApiManager.GetTickersAsDictionaryAsync().ConfigureAwait(false);
+                    var afterBD = afterDs.First(x => x["id"] == beforeL || x["name"] == before || x["symbol"] == beforeU);
                     if (isAfterBTC)
                     {
-                        result *= decimal.Parse(beforeBD["price_btc"]);
+                        result *= decimal.Parse(afterBD["price_btc"]);
                         route = $"{beforeU} > BTC";
                     }
                     else
                     {
-                        var afterDs = await ApiManager.GetTickersAsDictionaryAsync().ConfigureAwait(false);
-                        var afterBD = afterDs.First(x => x["id"] == beforeL || x["name"] == before || x["symbol"] == beforeU);
+                        var beforeDs = await ApiManager.GetTickersAsDictionaryAsync().ConfigureAwait(false);
+                        var beforeBD = beforeDs.First(x => x["id"] == afterL || x["name"] == after || x["symbol"] == afterU);
                         result *= decimal.Parse(afterBD["price_usd"]) / decimal.Parse(beforeBD["price_usd"]);
                         route = $"{beforeU} > BTC > {afterU}";
                     }
