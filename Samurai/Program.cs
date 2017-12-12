@@ -68,7 +68,7 @@ namespace AcidChicken.Samurai
                 using (var reader = new StreamReader(stream))
                 {
                     var result = JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
-                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been saved successfully.")).ConfigureAwait(false);
+                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been loaded successfully.")).ConfigureAwait(false);
                     return result;
                 }
             }
