@@ -46,7 +46,7 @@
   <dt><a href="https://github.com/acid-chicken/Rollbar.NET">acid-chicken/Rollbar.NET</a></dt>
   <dd>
     <a href="https://github.com/acid-chicken/Rollbar.NET/blob/master/LICENSE">MIT License</a>
-    <p>forked from this repository</p>
+    <div>forked from this repository</div>
     <dl>
       <dt><a href="https://github.com/rollbar/Rollbar.NET">rollbar/Rollbar.NET</a></dt>
       <dd><a href="https://github.com/rollbar/Rollbar.NET/blob/master/LICENSE">MIT License</a></dd>
