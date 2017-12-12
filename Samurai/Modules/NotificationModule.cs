@@ -107,8 +107,8 @@ namespace AcidChicken.Samurai.Modules
                                 .Select
                                 (x =>
                                     new EmbedFieldBuilder()
-                                        .WithName($"{x.Name}({x.Id})")
-                                        .WithValue($"{x.Guild.Name}({x.Guild.Id})")
+                                        .WithName($"#{x.Name}")
+                                        .WithValue($"サーバー:{x.Guild.Name}")
                                         .WithIsInline(true)
                                 )
                                 .ToList()
