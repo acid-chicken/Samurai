@@ -118,8 +118,8 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("換算前", $"{volume} {before}")
-                        .AddInlineField("換算後", $"{result} {after}")
+                        .AddInlineField("換算前", $"{volume} {beforeU}")
+                        .AddInlineField("換算後", $"{result} {afterU}")
             ).ConfigureAwait(false);
         }
     }
