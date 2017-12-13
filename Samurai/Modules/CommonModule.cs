@@ -35,7 +35,8 @@ namespace AcidChicken.Samurai.Modules
                                         var module = x.Module;
                                         while (!string.IsNullOrEmpty(module?.Name))
                                         {
-                                            builder.Insert(0, $"{x.Module.Name} ");
+                                            builder.Insert(0, ' ');
+                                            builder.Insert(0, x.Module.Name);
                                             module = module.Parent;
                                         }
                                         builder.Append(x.Name);
