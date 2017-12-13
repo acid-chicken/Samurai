@@ -70,6 +70,34 @@ namespace AcidChicken.Samurai.Modules
                         message: Context.User.Mention,
                         embed:
                             new EmbedBuilder()
+                            {
+                                Fields = new List<EmbedFieldBuilder>()
+                                {
+                                    new EmbedFieldBuilder()
+                                        .WithName("*引数*")
+                                        .WithValue("\u200b")
+                                }
+                                .Concat(command.Parameters.Select
+                                (x =>
+                                    new EmbedFieldBuilder()
+                                        .WithName(x.Name)
+                                        .WithValue($"{x.Summary}\n既定値:`{x.DefaultValue}`\n型:{x.Type.Name}{(x.IsOptional ? "\n(オプション)" : "")}{(x.IsMultiple ? "\n(複数指定可)" : "")}{(x.IsRemainder ? "\n(余白許容)" : "")}")
+                                ))
+                                .Concat(new List<EmbedFieldBuilder>
+                                {
+                                    new EmbedFieldBuilder()
+                                        .WithName("*エイリアス*")
+                                        .WithValue("\u200b")
+                                })
+                                .Concat(command.Aliases.Select
+                                (x =>
+                                    new EmbedFieldBuilder()
+                                        .WithName("\u200b")
+                                        .WithValue(x)
+                                        .WithIsInline(true)
+                                ))
+                                .ToList()
+                            }
                                 .WithTitle(command.Name)
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
