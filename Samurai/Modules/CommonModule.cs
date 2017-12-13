@@ -74,20 +74,22 @@ namespace AcidChicken.Samurai.Modules
                                 Fields = new List<EmbedFieldBuilder>()
                                 {
                                     new EmbedFieldBuilder()
-                                        .WithName("*引数*")
-                                        .WithValue("\u200b")
+                                        .WithName("~~――~~")
+                                        .WithValue("*引数*")
                                 }
                                 .Concat(command.Parameters.Select
                                 (x =>
                                     new EmbedFieldBuilder()
                                         .WithName(x.Name)
-                                        .WithValue($"{x.Summary}\n既定値:`{x.DefaultValue}`\n型:{x.Type.Name}{(x.IsOptional ? "\n(オプション)" : "")}{(x.IsMultiple ? "\n(複数指定可)" : "")}{(x.IsRemainder ? "\n(余白許容)" : "")}")
+                                        .WithValue($"**{x.Summary}**\n既定値`{(x.DefaultValue ?? "null")}`\n型`{x.Type.Name}`{(x.IsOptional ? "\n(オプション)" : "")}{(x.IsMultiple ? "\n(複数指定可)" : "")}{(x.IsRemainder ? "\n(余白許容)" : "")}")
+                                        .WithIsInline(true)
                                 ))
                                 .Concat(new List<EmbedFieldBuilder>
                                 {
                                     new EmbedFieldBuilder()
-                                        .WithName("*エイリアス*")
-                                        .WithValue("\u200b")
+                                        .WithName("~~―――――~~")
+                                        .WithValue("*エイリアス*")
+                                        .WithIsInline(true)
                                 })
                                 .Concat(command.Aliases.Select
                                 (x =>
