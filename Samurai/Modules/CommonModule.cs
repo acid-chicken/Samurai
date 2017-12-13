@@ -89,13 +89,12 @@ namespace AcidChicken.Samurai.Modules
                                     new EmbedFieldBuilder()
                                         .WithName("~~―――――~~")
                                         .WithValue("*エイリアス*")
-                                        .WithIsInline(true)
                                 })
                                 .Concat(command.Aliases.Select
                                 (x =>
                                     new EmbedFieldBuilder()
-                                        .WithName("\u200b")
-                                        .WithValue(x)
+                                        .WithName(x)
+                                        .WithValue("\u200b")
                                         .WithIsInline(true)
                                 ))
                                 .ToList()
