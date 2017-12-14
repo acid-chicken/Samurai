@@ -1,3 +1,6 @@
 [submodule "Samurai/Libraries/Rollbar"]
 	path = Samurai/Libraries/Rollbar
 	url = https://github.com/acid-chicken/Rollbar.NET
+[submodule "Samurai/Libraries/JsonRpc"]
+	path = Samurai/Libraries/JsonRpc
+	url = https://github.com/acid-chicken/JsonRpc
