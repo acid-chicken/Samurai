@@ -25,8 +25,7 @@
 2. Create *config.json* like this.
 ```json
 {
-  "discord_token": "BOT_TOKEN_GOES_HERE",
-  "monitor_channel": monitor_channel_id_goes_here
+  "discord_token": "BOT_TOKEN_GOES_HERE"
 }
 ```
 3. Execute `dotnet restore` and `dotnet run --project Samurai` .
