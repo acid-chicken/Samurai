@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EdjCase.JsonRpc.Client;
 using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
@@ -28,6 +29,8 @@ namespace AcidChicken.Samurai
 
         public static bool IsLoggerLocked { get; private set; }
 
+        public static RpcClient RpcClient { get; set; }
+
         public static async Task Main(string[] args)
         {
             if (File.Exists(ConfigurePath))
@@ -50,7 +53,7 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += RequestLogAsync;
-            DiscordClient.Ready += () => Task.WhenAny(NotificationManager.InitAsync(), MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
+            DiscordClient.Ready += () => Task.WhenAny(NotificationManager.InitAsync(), TippingManager.WorkAsync(), MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 
