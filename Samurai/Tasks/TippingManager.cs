@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using EdjCase.JsonRpc.Client;
-using EdjCase.JsonRpc.Core;
 using Discord;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -33,23 +33,31 @@ namespace AcidChicken.Samurai.Tasks
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 
-        public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync("getaccountaddress", account);
+        public static async Task<string> EnsureAccountAsync(string account) => (await TippingManager.InvokeMethodAsync<string>("getaccountaddress", account).ConfigureAwait(false)).Result;
 
         public static string GetAccountName(IUser user) => $"discord:{user.Id}";
 
-        public static async Task<string> InvokeMethodAsync(string method, params object[] args) => (await RpcClient.SendRequestAsync(new RpcRequest("request", method, JToken.Parse($"[{string.Join(',', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\""))}]"))).ConfigureAwait(false)).GetResult<string>();
+        public static async Task<RpcResponse<T>> InvokeMethodAsync<T>(string method, params object[] args)
+        {
+            using (var response = await BitZenyClient.PostAsync("", new StringContent($"{{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":{method},\"params\":[{string.Join(',', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\""))}]", Encoding.UTF8, "application/json-rpc")).ConfigureAwait(false))
+            using (var content = response.Content)
+            {
+                return JsonConvert.DeserializeObject<RpcResponse<T>>(await content.ReadAsStringAsync().ConfigureAwait(false));
+            }
+        }
 
         public static Task WorkAsync() => WorkAsync(default);
 
         public static async Task WorkAsync(CancellationToken token = default)
         {
             Queue = Queue.Union(ApplicationConfig.Queue).ToList();
-            RpcClient = new RpcClient
-            (
-                baseUrl: new Uri(ApplicationConfig.RpcServer),
-                authHeaderValue: new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{ApplicationConfig.RpcUser}:{ApplicationConfig.RpcPassword}"))),
-                contentType: "application/json-rpc"
-            );
+            BitZenyClient = new HttpClient()
+            {
+                BaseAddress = new Uri(ApplicationConfig.RpcServer),
+                Timeout = Timeout.InfiniteTimeSpan
+            };
+            BitZenyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{ApplicationConfig.RpcUser}:{ApplicationConfig.RpcPassword}")));
+
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll

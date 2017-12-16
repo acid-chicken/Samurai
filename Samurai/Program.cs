@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EdjCase.JsonRpc.Client;
 using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
@@ -21,6 +20,8 @@ namespace AcidChicken.Samurai
 
         public static Config ApplicationConfig { get; set; }
 
+        public static HttpClient BitZenyClient { get; set; }
+
         public static DiscordSocketClient DiscordClient { get; set; }
 
         public static DiscordSocketConfig DiscordClientConfig { get; set; }
@@ -28,8 +29,6 @@ namespace AcidChicken.Samurai
         public static HttpClient HttpClient { get; set; } = new HttpClient();
 
         public static bool IsLoggerLocked { get; private set; }
-
-        public static RpcClient RpcClient { get; set; }
 
         public static async Task Main(string[] args)
         {
