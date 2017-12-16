@@ -21,7 +21,7 @@
 
 ## How to use
 
-1. Get [.NET Core SDK](https://dot.net/core) .
+1. Get [.NET Core SDK](https://dot.net/core) and [BitZeny](https://github.com/BitzenyCoreDevelopers/bitzeny) .
 2. Create *config.json* like this.
 ```json
 {
@@ -34,6 +34,7 @@
 ## Requirements
 
 * [.NET Core SDK 2.0.0 or later](https://dot.net/core)
+* [BitZeny z1.0.0 or later](https://github.com/BitzenyCoreDevelopers/bitzeny)
 
 ## References
 
