@@ -43,11 +43,15 @@ namespace AcidChicken.Samurai.Tasks
             using (var process = Process.Start(new ProcessStartInfo("bitzeny-cli", string.Join(' ', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\"")))
             {
                 UseShellExecute = false,
+                RedirectStandardOutput = true,
                 CreateNoWindow = true
             }))
             using (var reader = process.StandardOutput)
             {
-                return JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                var result = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                process.WaitForExit();
+                process.Close();
+                return result;
             }
         }
 
