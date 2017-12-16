@@ -37,7 +37,7 @@ namespace AcidChicken.Samurai.Tasks
 
         public static string GetAccountName(IUser user) => $"discord:{user.Id}";
 
-        public static async Task<string> InvokeMethodAsync(string method, params object[] args) => (await RpcClient.SendRequestAsync(new RpcRequest(new RpcId("request"), method, JToken.Parse($"[{string.Join(',', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\""))}]"))).ConfigureAwait(false)).GetResult<string>();
+        public static async Task<string> InvokeMethodAsync(string method, params object[] args) => (await RpcClient.SendRequestAsync(new RpcRequest("request", method, JToken.Parse($"[{string.Join(',', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\""))}]"))).ConfigureAwait(false)).GetResult<string>();
 
         public static Task WorkAsync() => WorkAsync(default);
 
