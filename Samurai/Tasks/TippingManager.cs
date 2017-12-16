@@ -51,7 +51,7 @@ namespace AcidChicken.Samurai.Tasks
                 var output = await reader.ReadToEndAsync().ConfigureAwait(false);
                 process.WaitForExit();
                 process.Close();
-                return output;
+                return output.Trim();
             }
         }
 
