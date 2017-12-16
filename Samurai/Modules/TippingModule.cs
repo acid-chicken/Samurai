@@ -145,11 +145,11 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("withdraw"), Summary("指定されたアドレスに出金します。金額を指定しなかった場合は全額出金されます。"), Alias("出金")]
-        public async Task WithDrawAsync([Summary("送り先のアドレス")] string address, [Remainder, Summary("金額")] decimal? amount = null)
+        public async Task WithDrawAsync([Summary("送り先のアドレス")] string address, [Remainder, Summary("金額")] decimal amount = decimal.MinusOne)
         {
             var account = TippingManager.GetAccountName(Context.User);
             await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
-            var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, (decimal)(amount ?? decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false)))).ConfigureAwait(false);
+            var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount == decimal.MinusOne ? decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false)) : amount).ConfigureAwait(false);
             await ReplyAsync
             (
                 message: Context.User.Mention,
