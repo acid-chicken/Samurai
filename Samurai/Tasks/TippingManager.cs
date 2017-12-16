@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -33,16 +34,20 @@ namespace AcidChicken.Samurai.Tasks
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 
-        public static async Task<string> EnsureAccountAsync(string account) => (await TippingManager.InvokeMethodAsync<string>("getaccountaddress", account).ConfigureAwait(false)).Result;
+        public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync<string>("getaccountaddress", account);
 
         public static string GetAccountName(IUser user) => $"discord:{user.Id}";
 
-        public static async Task<RpcResponse<T>> InvokeMethodAsync<T>(string method, params object[] args)
+        public static async Task<T> InvokeMethodAsync<T>(params object[] args)
         {
-            using (var response = await BitZenyClient.PostAsync("", new StringContent($"{{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":{method},\"params\":[{string.Join(',', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\""))}]", Encoding.UTF8, "application/json-rpc")).ConfigureAwait(false))
-            using (var content = response.Content)
+            using (var process = Process.Start(new ProcessStartInfo("bitzeny-cli", string.Join(' ', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\"")))
             {
-                return JsonConvert.DeserializeObject<RpcResponse<T>>(await content.ReadAsStringAsync().ConfigureAwait(false));
+                UseShellExecute = false,
+                CreateNoWindow = true
+            }))
+            using (var reader = process.StandardOutput)
+            {
+                return JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync().ConfigureAwait(false));
             }
         }
 
