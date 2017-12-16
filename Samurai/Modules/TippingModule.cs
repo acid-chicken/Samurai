@@ -33,7 +33,7 @@ namespace AcidChicken.Samurai.Modules
                     await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
                 }
             }));
-            var balance = await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false);
+            var balance = await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -67,7 +67,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("send"), Summary("指定されたユーザーに送金します。"), Alias("送金")]
-        public async Task SendAsync([Summary("送り先のユーザー")] IUser user, [Summary("金額")] decimal amount)
+        public async Task SendAsync([Summary("送り先のユーザー")] IUser user, [Remainder, Summary("金額")] decimal amount)
         {
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(TippingManager.GetAccountName(user)).ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("tip"), Summary("指定されたユーザーに投げ銭します。"), Alias("投銭")]
-        public async Task TipAsync([Summary("送り先のユーザー")] IUser user, [Summary("金額")] decimal amount)
+        public async Task TipAsync([Summary("送り先のユーザー")] IUser user, [Remainder, Summary("金額")] decimal amount)
         {
             var limit = DateTimeOffset.Now.AddDays(3);
             await TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, user.Id, limit, amount));
@@ -141,6 +141,28 @@ namespace AcidChicken.Samurai.Modules
                         .WithThumbnailUrl(Context.User.GetAvatarUrl())
                         .AddInlineField("金額", $"{amount} ZNY")
                         .AddInlineField("受取期限", limit)
+            ).ConfigureAwait(false);
+        }
+
+        [Command("withdraw"), Summary("指定されたアドレスに出金します。金額を指定しなかった場合は全額出金されます。"), Alias("出金")]
+        public async Task WithDrawAsync([Summary("送り先のアドレス")] string address, [Remainder, Summary("金額")] decimal? amount = null)
+        {
+            var account = TippingManager.GetAccountName(Context.User);
+            await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
+            var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, (decimal)(amount ?? decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false)))).ConfigureAwait(false);
+            await ReplyAsync
+            (
+                message: Context.User.Mention,
+                embed:
+                    new EmbedBuilder()
+                        .WithTitle("出金完了")
+                        .WithDescription($"```{address}```\nに出金しました。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Green)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(Context.User)
+                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("トランザクションID", txid)
             ).ConfigureAwait(false);
         }
     }
