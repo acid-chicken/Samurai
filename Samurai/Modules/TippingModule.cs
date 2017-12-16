@@ -24,7 +24,7 @@ namespace AcidChicken.Samurai.Modules
                 try
                 {
                     var from = DiscordClient.GetUser(x.From);
-                    var txid = await TippingManager.InvokeMethodAsync<string>("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
+                    var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
                     var dequeued = await TippingManager.DequeueAsync(x).ConfigureAwait(false);
                     await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
                 }
@@ -33,7 +33,7 @@ namespace AcidChicken.Samurai.Modules
                     await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
                 }
             }));
-            var balance = await TippingManager.InvokeMethodAsync<decimal>("getbalance", account).ConfigureAwait(false);
+            var balance = await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -71,7 +71,7 @@ namespace AcidChicken.Samurai.Modules
         {
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(TippingManager.GetAccountName(user)).ConfigureAwait(false);
-            var txid = await TippingManager.InvokeMethodAsync<string>("sendfrom", account, address, amount).ConfigureAwait(false);
+            var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount).ConfigureAwait(false);
             await ReplyAsync
             (
                 message: Context.User.Mention,

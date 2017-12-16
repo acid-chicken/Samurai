@@ -34,11 +34,11 @@ namespace AcidChicken.Samurai.Tasks
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 
-        public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync<string>("getaccountaddress", account);
+        public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync("getaccountaddress", account);
 
         public static string GetAccountName(IUser user) => $"discord:{user.Id}";
 
-        public static async Task<T> InvokeMethodAsync<T>(params object[] args)
+        public static async Task<string> InvokeMethodAsync(params object[] args)
         {
             using (var process = Process.Start(new ProcessStartInfo("bitzeny-cli", string.Join(' ', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\"")))
             {
@@ -48,10 +48,10 @@ namespace AcidChicken.Samurai.Tasks
             }))
             using (var reader = process.StandardOutput)
             {
-                var result = JsonConvert.DeserializeObject<T>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                var output = await reader.ReadToEndAsync().ConfigureAwait(false);
                 process.WaitForExit();
                 process.Close();
-                return result;
+                return output;
             }
         }
 
