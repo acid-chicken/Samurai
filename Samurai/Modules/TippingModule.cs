@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Net;
 
 namespace AcidChicken.Samurai.Modules
 {
@@ -81,13 +82,17 @@ namespace AcidChicken.Samurai.Modules
                     var channels = new List<IMessage>();
                     await Task.WhenAll((await guild.Guild.GetTextChannelsAsync().ConfigureAwait(false)).Select(async channel =>
                     {
-                        var messages = new List<IMessage>(await channel.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
-                        while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
+                        try
                         {
-                            await channel.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
+                            var messages = new List<IMessage>(await channel.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
+                            while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
+                            {
+                                await channel.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
+                            }
+                            channels.AddRange(messages);
+                            messages.Select(x => x.Author).Select(x => targets.Add(x));
                         }
-                        channels.AddRange(messages);
-                        messages.Select(x => x.Author).Select(x => targets.Add(x));
+                        catch (HttpException ex) when ((ex.DiscordCode ?? 0) == 50001) { }
                     })).ConfigureAwait(false);
                     break;
                 }
