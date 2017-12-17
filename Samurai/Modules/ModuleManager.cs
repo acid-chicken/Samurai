@@ -41,7 +41,9 @@ namespace AcidChicken.Samurai.Modules
             var position = 0;
             var message = socketMessage as SocketUserMessage;
             var guildChannel = message.Channel as IGuildChannel;
-            if (message == null || !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position)))) return;
+            if (message == null ||
+                !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position))) ||
+                (guildChannel != null && ((ITextChannel)guildChannel).Topic.Contains($"{Prefix}ignore"))) return;
             var context = new CommandContext(DiscordClient, message);
             var result = await Service.ExecuteAsync(context, position);
             if (!result.IsSuccess)
