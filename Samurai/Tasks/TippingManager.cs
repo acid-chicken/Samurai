@@ -21,17 +21,15 @@ namespace AcidChicken.Samurai.Tasks
     {
         public static List<TipQueue> Queue { get; set; } = new List<TipQueue>();
 
-        public static async Task<bool> DequeueAsync(TipQueue queue)
+        public static Task<bool> DequeueAsync(TipQueue queue)
         {
-            var result = Queue.Remove(queue);
-            await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
-            return result;
+            return Task.FromResult(Queue.Remove(queue));
         }
 
-        public static async Task EnqueueAsync(TipQueue queue)
+        public static Task EnqueueAsync(TipQueue queue)
         {
             Queue.Add(queue);
-            await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync("getaccountaddress", account);
