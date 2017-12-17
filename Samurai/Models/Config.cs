@@ -11,17 +11,14 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("discord_token")]
         public string DiscordToken { get; set; } = "";
 
+        [JsonProperty("last_posts")]
+        public Dictionary<ulong, Dictionary<ulong, DateTimeOffset>> LastPosts { get; set; } = new Dictionary<ulong, Dictionary<ulong, DateTimeOffset>>();
+
         [JsonProperty("notification_channels")]
         public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
         [JsonProperty("queue")]
         public List<TipQueue> Queue { get; set; } = new List<TipQueue>();
-
-        // [JsonProperty("rollbar_environment")]
-        // public string RollbarEnvironment { get; set; } = "production";
-
-        // [JsonProperty("rollbar_token")]
-        // public string RollbarConfig { get; set; } = "";
 
         [JsonProperty("rpc_password")]
         public string RpcPassword { get; set; } = "";
