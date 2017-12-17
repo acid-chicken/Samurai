@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -34,6 +35,7 @@ namespace AcidChicken.Samurai.Modules
                 }
             }));
             var balance = await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false);
+            var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -45,6 +47,8 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
+                        .AddInlineField("利用可能", $"{decimal.Parse(balance) - queued:N8} ZNY")
+                        .AddInlineField("受取待ち", $"{queued:N8} ZNY")
             ).ConfigureAwait(false);
         }
 
@@ -84,7 +88,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
                         .WithThumbnailUrl(user.GetAvatarUrl())
-                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
                         .AddInlineField("トランザクションID", txid)
             ).ConfigureAwait(false);
             var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
@@ -100,10 +104,10 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(user)
                         .WithThumbnailUrl(Context.User.GetAvatarUrl())
-                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
                         .AddInlineField("受取期限", txid)
             ).ConfigureAwait(false);
-            await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {amount} ZNY from {Context.User.Username}#{Context.User.Discriminator} to {user.Username}#{user.Discriminator}.")).ConfigureAwait(false);
+            await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {amount:N8} ZNY from {Context.User.Username}#{Context.User.Discriminator} to {user.Username}#{user.Discriminator}.")).ConfigureAwait(false);
         }
 
         [Command("tip"), Summary("指定されたユーザーに投げ銭します。"), Alias("投銭")]
@@ -123,7 +127,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
                         .WithThumbnailUrl(user.GetAvatarUrl())
-                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
                         .AddInlineField("受取期限", limit)
             ).ConfigureAwait(false);
             var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
@@ -139,7 +143,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(user)
                         .WithThumbnailUrl(Context.User.GetAvatarUrl())
-                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
                         .AddInlineField("受取期限", limit)
             ).ConfigureAwait(false);
         }
@@ -161,7 +165,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Green)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("金額", $"{amount} ZNY")
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
                         .AddInlineField("トランザクションID", txid)
             ).ConfigureAwait(false);
         }
