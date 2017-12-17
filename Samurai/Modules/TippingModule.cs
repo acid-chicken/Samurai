@@ -75,39 +75,9 @@ namespace AcidChicken.Samurai.Modules
         public async Task RainAsync([Summary("金額")] decimal totalAmount, [Summary("対象期間(時間単位)")] double hours = 24.0)
         {
             var targets = new HashSet<IUser>();
-            switch (Context.Channel)
-            {
-                case IGuildChannel guild:
-                {
-                    var channels = new List<IMessage>();
-                    await Task.WhenAll((await guild.Guild.GetTextChannelsAsync().ConfigureAwait(false)).Select(async channel =>
-                    {
-                        try
-                        {
-                            var messages = new List<IMessage>(await channel.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
-                            while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
-                            {
-                                await channel.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
-                            }
-                            channels.AddRange(messages);
-                            messages.Select(x => x.Author).Select(x => targets.Add(x));
-                        }
-                        catch (HttpException ex) when ((ex.DiscordCode ?? 0) == 50001) { }
-                    })).ConfigureAwait(false);
-                    break;
-                }
-                case IGroupChannel group:
-                {
-                    var messages = new List<IMessage>(await group.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
-                    while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
-                    {
-                        await group.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
-                    }
-                    targets = messages.Select(x => x.Author).Distinct().ToHashSet();
-                    break;
-                }
-            }
+            await Context.Channel.GetUsersAsync().ForEachAsync(users => users.Select(x => targets.Add(x)));
             targets.Remove(Context.User);
+            targets.RemoveWhere(x => string.IsNullOrEmpty(x.GetAvatarUrl()));
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
