@@ -22,8 +22,6 @@ namespace AcidChicken.Samurai.Modules
             Service = new CommandService();
         }
 
-        public static bool IsHandlerLocked { get; private set; }
-
         public static CommandService Service { get; }
 
         public static CommandServiceConfig ServiceConfig { get; }
@@ -36,12 +34,12 @@ namespace AcidChicken.Samurai.Modules
 
         public static async Task HandleCommandAsync(SocketMessage socketMessage)
         {
-            while (IsHandlerLocked) await Task.Delay(1).ConfigureAwait(false);
-            IsHandlerLocked = true;
             var position = 0;
             var message = socketMessage as SocketUserMessage;
             var guildChannel = message.Channel as IGuildChannel;
-            if (message == null || !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position)))) return;
+            if (message == null ||
+                !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) || (message.HasStringPrefix(Prefix, ref position))) ||
+                (guildChannel != null && ((ITextChannel)guildChannel).Topic.Contains($"{Prefix}ignore"))) return;
             var context = new CommandContext(DiscordClient, message);
             var result = await Service.ExecuteAsync(context, position);
             if (!result.IsSuccess)
@@ -59,7 +57,6 @@ namespace AcidChicken.Samurai.Modules
                             .WithAuthor(context.User)
                 );
             }
-            IsHandlerLocked = false;
         }
     }
 }
