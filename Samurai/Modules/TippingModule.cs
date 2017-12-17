@@ -71,7 +71,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("rain"), Summary("指定した期間以降に発言したユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
-        public async Task RainAsync([Summary("金額")] decimal totalAmount, [Summary("対象期間(時間単位)")] double hours = 24.0, [Summary("対象となる権限")] params IRole[] roles)
+        public async Task RainAsync([Summary("金額")] decimal totalAmount, [Summary("対象期間(時間単位)")] double hours = 24.0)
         {
             var targets = new HashSet<IUser>();
             switch (Context.Channel)
@@ -87,12 +87,7 @@ namespace AcidChicken.Samurai.Modules
                             await channel.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
                         }
                         channels.AddRange(messages);
-                        targets =
-                            messages
-                                .Where(message => ((IGuildUser)message.Author).RoleIds.Any(role => roles?.Select(x => x.Id).Contains(role) ?? true))
-                                .Select(x => x.Author)
-                                .Distinct()
-                                .ToHashSet();
+                        messages.Select(x => x.Author).Select(x => targets.Add(x));
                     })).ConfigureAwait(false);
                     break;
                 }
