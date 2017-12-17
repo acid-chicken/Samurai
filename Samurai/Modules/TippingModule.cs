@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
 {
@@ -71,13 +72,26 @@ namespace AcidChicken.Samurai.Modules
             ).ConfigureAwait(false);
         }
 
-        [Command("rain"), Summary("指定した期間以降に発言したユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
-        public async Task RainAsync([Summary("金額")] decimal totalAmount, [Summary("対象期間(時間単位)")] double hours = 24.0)
+        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
+        public async Task RainAsync([Summary("金額")] decimal totalAmount)
         {
             var targets = new HashSet<IUser>();
-            await Context.Channel.GetUsersAsync().ForEachAsync(users => users.Select(x => targets.Add(x)));
+            var dictionary =
+                JsonConvert
+                    .DeserializeObject<Dictionary<string, decimal>>(await TippingManager.InvokeMethodAsync("listaccounts").ConfigureAwait(false))
+                    .Where
+                    (user =>
+                        user.Key.StartsWith("discord:") &&
+                        user.Value >= 10 &&
+                        Context.Channel
+                            .GetUsersAsync()
+                            .Flatten()
+                            .Result
+                                .Select(x => x.Id)
+                                .Contains(ulong.TryParse(new string(user.Key.Skip(8).ToArray()), out ulong result) ? result : 0)
+                    )
+                    .ToDictionary(x => x.Key, x => x.Value);
             targets.Remove(Context.User);
-            targets.RemoveWhere(x => string.IsNullOrEmpty(x.GetAvatarUrl()));
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
@@ -95,7 +109,7 @@ namespace AcidChicken.Samurai.Modules
                     embed:
                         new EmbedBuilder()
                             .WithTitle("撒き銭完了")
-                            .WithDescription($"撒き銭しました。DM通知は行われませんのでご注意下さい。")
+                            .WithDescription("撒き銭しました。DM通知は行われませんのでご注意下さい。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Green)
                             .WithFooter(EmbedManager.CurrentFooter)
@@ -114,7 +128,7 @@ namespace AcidChicken.Samurai.Modules
                     embed:
                         new EmbedBuilder()
                             .WithTitle("撒き銭失敗")
-                            .WithDescription($"撒き銭に失敗しました。撒き銭できるユーザーがいません。")
+                            .WithDescription("撒き銭に失敗しました。撒き銭できるユーザーがいません。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
                             .WithFooter(EmbedManager.CurrentFooter)
