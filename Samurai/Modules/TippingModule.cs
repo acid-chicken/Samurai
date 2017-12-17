@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
 {
@@ -71,42 +72,25 @@ namespace AcidChicken.Samurai.Modules
             ).ConfigureAwait(false);
         }
 
-        [Command("rain"), Summary("指定した期間以降に発言したユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
-        public async Task RainAsync([Summary("金額")] decimal totalAmount, [Summary("対象期間(時間単位)")] double hours = 24.0)
+        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
+        public async Task RainAsync([Summary("金額")] decimal totalAmount)
         {
             var targets = new HashSet<IUser>();
-            switch (Context.Channel)
-            {
-                case IGuildChannel guild:
-                {
-                    var channels = new List<IMessage>();
-                    await Task.WhenAll((await guild.Guild.GetTextChannelsAsync().ConfigureAwait(false)).Select(async channel =>
-                    {
-                        try
-                        {
-                            var messages = new List<IMessage>(await channel.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
-                            while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
-                            {
-                                await channel.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
-                            }
-                            channels.AddRange(messages);
-                            messages.Select(x => x.Author).Select(x => targets.Add(x));
-                        }
-                        catch (HttpException ex) when ((ex.DiscordCode ?? 0) == 50001) { }
-                    })).ConfigureAwait(false);
-                    break;
-                }
-                case IGroupChannel group:
-                {
-                    var messages = new List<IMessage>(await group.GetMessagesAsync().Flatten().ConfigureAwait(false)).OrderByDescending(x => x.CreatedAt).ToList();
-                    while (Context.Message.CreatedAt - messages.LastOrDefault().CreatedAt <= TimeSpan.FromHours(hours))
-                    {
-                        await group.GetMessagesAsync(messages.LastOrDefault(), Direction.Before).ForEachAsync(x => messages.AddRange(x)).ConfigureAwait(false);
-                    }
-                    targets = messages.Select(x => x.Author).Distinct().ToHashSet();
-                    break;
-                }
-            }
+            var dictionary =
+                JsonConvert
+                    .DeserializeObject<Dictionary<string, decimal>>(await TippingManager.InvokeMethodAsync("listaccounts").ConfigureAwait(false))
+                    .Where
+                    (user =>
+                        user.Key.StartsWith("discord:") &&
+                        user.Value >= 10 &&
+                        Context.Channel
+                            .GetUsersAsync()
+                            .Flatten()
+                            .Result
+                                .Select(x => x.Id)
+                                .Contains(ulong.TryParse(new string(user.Key.Skip(8).ToArray()), out ulong result) ? result : 0)
+                    )
+                    .ToDictionary(x => x.Key, x => x.Value);
             targets.Remove(Context.User);
             if (targets.Any())
             {
@@ -125,7 +109,7 @@ namespace AcidChicken.Samurai.Modules
                     embed:
                         new EmbedBuilder()
                             .WithTitle("撒き銭完了")
-                            .WithDescription($"撒き銭しました。DM通知は行われませんのでご注意下さい。")
+                            .WithDescription("撒き銭しました。DM通知は行われませんのでご注意下さい。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Green)
                             .WithFooter(EmbedManager.CurrentFooter)
@@ -144,7 +128,7 @@ namespace AcidChicken.Samurai.Modules
                     embed:
                         new EmbedBuilder()
                             .WithTitle("撒き銭失敗")
-                            .WithDescription($"撒き銭に失敗しました。撒き銭できるユーザーがいません。")
+                            .WithDescription("撒き銭に失敗しました。撒き銭できるユーザーがいません。")
                             .WithCurrentTimestamp()
                             .WithColor(Colors.Red)
                             .WithFooter(EmbedManager.CurrentFooter)
