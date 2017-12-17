@@ -28,6 +28,8 @@ namespace AcidChicken.Samurai
 
         public static HttpClient HttpClient { get; set; } = new HttpClient();
 
+        public static bool IsConfigLocked { get; private set; }
+
         public static bool IsLoggerLocked { get; private set; }
 
         public static async Task Main(string[] args)
@@ -64,14 +66,19 @@ namespace AcidChicken.Samurai
 
         public static async Task<Config> LoadConfigAsync(string path = ConfigurePath)
         {
+            while (IsConfigLocked)
+            {
+                await Task.Delay(1).ConfigureAwait(false);
+            }
+            IsConfigLocked = true;
+            Config result;
             try
             {
                 using (var stream = File.OpenRead(path))
                 using (var reader = new StreamReader(stream))
                 {
-                    var result = JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
+                    result = JsonConvert.DeserializeObject<Config>(await reader.ReadToEndAsync().ConfigureAwait(false));
                     await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "Program", "The config has been loaded successfully.")).ConfigureAwait(false);
-                    return result;
                 }
             }
             catch (Exception ex)
@@ -79,10 +86,17 @@ namespace AcidChicken.Samurai
                 await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
+            IsConfigLocked = false;
+            return result;
         }
 
         public static async Task SaveConfigAsync(Config config, string path = ConfigurePath)
         {
+            while (IsConfigLocked)
+            {
+                await Task.Delay(1).ConfigureAwait(false);
+            }
+            IsConfigLocked = true;
             try
             {
                 using (var stream = File.OpenWrite(path))
@@ -97,6 +111,7 @@ namespace AcidChicken.Samurai
                 await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
+            IsConfigLocked = false;
         }
 
         public static async Task LogAsync(LogMessage message)
