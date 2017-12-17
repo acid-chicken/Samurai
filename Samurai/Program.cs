@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-// using Rollbar = RollbarDotNet; // It has namespace conflicts.
 
 namespace AcidChicken.Samurai
 {
@@ -44,10 +43,6 @@ namespace AcidChicken.Samurai
                 return;
             }
 
-            // Rollbar.Rollbar.Init(new Rollbar.RollbarConfig(ApplicationConfig.RollbarConfig)
-            // {
-            //     Environment = ApplicationConfig.RollbarEnvironment
-            // });
             DiscordClientConfig = new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Verbose
