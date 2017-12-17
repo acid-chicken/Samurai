@@ -22,8 +22,6 @@ namespace AcidChicken.Samurai.Modules
             Service = new CommandService();
         }
 
-        public static bool IsHandlerLocked { get; private set; }
-
         public static CommandService Service { get; }
 
         public static CommandServiceConfig ServiceConfig { get; }
@@ -36,8 +34,6 @@ namespace AcidChicken.Samurai.Modules
 
         public static async Task HandleCommandAsync(SocketMessage socketMessage)
         {
-            while (IsHandlerLocked) await Task.Delay(1).ConfigureAwait(false);
-            IsHandlerLocked = true;
             var position = 0;
             var message = socketMessage as SocketUserMessage;
             var guildChannel = message.Channel as IGuildChannel;
@@ -61,7 +57,6 @@ namespace AcidChicken.Samurai.Modules
                             .WithAuthor(context.User)
                 );
             }
-            IsHandlerLocked = false;
         }
     }
 }
