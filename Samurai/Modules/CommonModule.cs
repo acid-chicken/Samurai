@@ -102,7 +102,7 @@ namespace AcidChicken.Samurai.Modules
                                 .WithTitle(command.Name)
                                 .WithDescription(command.Summary)
                                 .WithCurrentTimestamp()
-                                .WithColor(Colors.Green)
+                                .WithColor(Colors.Blue)
                                 .WithFooter(EmbedManager.CurrentFooter)
                                 .WithAuthor(Context.User)
                     ).ConfigureAwait(false);
@@ -125,6 +125,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
+                        .WithThumbnailUrl(DiscordClient.CurrentUser.GetAvatarUrl())
                         .AddInlineField("バージョン", ((AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyInformationalVersionAttribute))).InformationalVersion)
                         .AddInlineField("著作権情報", ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute))).Copyright)
             ).ConfigureAwait(false);
