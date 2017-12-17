@@ -97,10 +97,10 @@ namespace AcidChicken.Samurai.Modules
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = totalAmount / targets.Count;
                 var mentions = string.Join(' ', targets.Select(x => x.Mention));
-                var isExtract = mentions.Length > EmbedBuilder.MaxDescriptionLength;
+                var isExtract = mentions.Length > 1024;
                 if (isExtract)
                 {
-                    var chars = mentions.Take(EmbedBuilder.MaxDescriptionLength);
+                    var chars = mentions.Take(1024);
                     mentions = new string(chars.Take(chars.ToList().LastIndexOf('>')).ToArray());
                 }
                 await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, x.Id, limit, amount))).Append(ReplyAsync
