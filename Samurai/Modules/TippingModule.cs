@@ -96,13 +96,6 @@ namespace AcidChicken.Samurai.Modules
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = totalAmount / targets.Count;
-                var mentions = string.Join(' ', targets.Select(x => x.Mention));
-                var isExtract = mentions.Length > 1024;
-                if (isExtract)
-                {
-                    var chars = mentions.Take(1024);
-                    mentions = new string(chars.Take(chars.ToList().LastIndexOf('>')).ToArray());
-                }
                 await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, x.Id, limit, amount))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -117,7 +110,6 @@ namespace AcidChicken.Samurai.Modules
                             .AddInlineField("一人あたりの金額", $"{amount:N8} ZNY")
                             .AddInlineField("対象者数", $"{targets.Count} 人")
                             .AddInlineField("総金額", $"{totalAmount:N8} ZNY")
-                            .AddInlineField(isExtract ? "対象者（抜粋）" : "対象者", mentions)
                 ))).ConfigureAwait(false);
             }
             else
