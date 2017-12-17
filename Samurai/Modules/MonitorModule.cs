@@ -22,7 +22,6 @@ namespace AcidChicken.Samurai.Modules
         {
             if (MonitorManager.AddMonitor(name, hostname) && ApplicationConfig.Monitors.TryAdd(name, new Monitor(hostname)))
             {
-                await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -79,7 +78,6 @@ namespace AcidChicken.Samurai.Modules
         {
             if (MonitorManager.DeleteMonitor(name) && ApplicationConfig.Monitors.Remove(name))
             {
-                await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,

@@ -36,6 +36,7 @@ namespace AcidChicken.Samurai
             if (File.Exists(ConfigurePath))
             {
                 ApplicationConfig = await LoadConfigAsync().ConfigureAwait(false);
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) => SaveConfigAsync(ApplicationConfig).RunSynchronously();
             }
             else
             {
