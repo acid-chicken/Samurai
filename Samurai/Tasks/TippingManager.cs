@@ -19,18 +19,18 @@ namespace AcidChicken.Samurai.Tasks
 
     public static class TippingManager
     {
-        public static List<TipQueue> Queue { get; set; } = new List<TipQueue>();
+        public static Dictionary<ulong, List<TipQueue>> Queue { get; set; } = new Dictionary<ulong, List<TipQueue>>();
 
-        public static Task<bool> DequeueAsync(TipQueue queue)
+        public static Task<bool> DequeueAsync(ulong id, TipQueue queue)
         {
-            Queue.RemoveAll(x => x == null);
-            return Task.FromResult(Queue.Remove(queue));
+            Queue[id].RemoveAll(x => x == null);
+            return Task.FromResult(Queue[id].Remove(queue));
         }
 
-        public static Task EnqueueAsync(TipQueue queue)
+        public static Task EnqueueAsync(ulong id, TipQueue queue)
         {
-            Queue.Add(queue);
-            Queue.RemoveAll(x => x == null);
+            Queue[id].Add(queue);
+            Queue[id].RemoveAll(x => x == null);
             return Task.CompletedTask;
         }
 
@@ -59,7 +59,7 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token = default)
         {
-            Queue = Queue.Union(ApplicationConfig.Queue).ToList();
+            Queue = Queue.ToList().Union(ApplicationConfig.Queue).ToDictionary(x => x.Key, x => x.Value);
             BitZenyClient = new HttpClient()
             {
                 BaseAddress = new Uri(ApplicationConfig.RpcServer),
@@ -80,7 +80,7 @@ namespace AcidChicken.Samurai.Tasks
 
         public static Task CheckQueueAsync()
         {
-            Queue.RemoveAll(x => x == null || x.Limit < DateTimeOffset.Now);
+            Queue.Select(user => user.Value.RemoveAll(x => x == null || x.Limit < DateTimeOffset.Now));
             return Task.CompletedTask;
         }
     }
