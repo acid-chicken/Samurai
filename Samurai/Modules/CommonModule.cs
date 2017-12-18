@@ -112,6 +112,54 @@ namespace AcidChicken.Samurai.Modules
             }
         }
 
+        [Command("prefix"), Summary("プレフィックスを設定します。"), RequireContext(ContextType.Guild)]
+        public async Task PrefixAsync([Summary("新しいプレフィックス")] string prefix)
+        {
+            if (ApplicationConfig.Managers.Contains(Context.User.Id))
+            {
+                var before = ModuleManager.Prefix;
+                if (ApplicationConfig.PrefixOverrides.ContainsKey(Context.Guild.Id))
+                {
+                    before = ApplicationConfig.PrefixOverrides[Context.Guild.Id];
+                    ApplicationConfig.PrefixOverrides[Context.Guild.Id] = prefix;
+                }
+                else
+                {
+                    ApplicationConfig.PrefixOverrides.Add(Context.Guild.Id, prefix);
+                }
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("プレフィック設定完了")
+                            .WithDescription("プレフィックを設定しました。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Green)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                            .AddInlineField("設定前", before)
+                            .AddInlineField("設定後", prefix)
+                            .AddInlineField("対象サーバー", Context.Guild.Name)
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("プレフィック設定失敗")
+                            .WithDescription("プレフィックを設定する権限がありません。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Red)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
+            }
+        }
+
         [Command("save"), Summary("Botの最新状態を安全に保存します。")]
         public async Task SaveAsync()
         {

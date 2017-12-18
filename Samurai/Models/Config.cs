@@ -20,6 +20,9 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("notification_channels")]
         public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
+        [JsonProperty("prefix_overrides")]
+        public Dictionary<ulong, string> PrefixOverrides { get; set; } = new Dictionary<ulong, string>();
+
         [JsonProperty("queue")]
         public List<TipQueue> Queue { get; set; } = new List<TipQueue>();
 
