@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Title>Samurai</Title>
-    <Version>0.87</Version>
+    <Version>0.88</Version>
     <Author>Acid Chicken</Author>
     <Description>An Discord bot for BitZeny users.</Description>
     <Copyright>Copyright (c) 2017 Acid Chicken (硫酸鶏)</Copyright>
