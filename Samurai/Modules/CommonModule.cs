@@ -179,7 +179,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("set"), Summary("ユーザー設定を編集します。")]
-        public async Task SetAsync([Summary("設定キー")] string key, [Summary("設定値")] string value, [Remainder] string comment = null)
+        public Task SetAsync([Summary("設定キー")] string key, [Summary("設定値")] string value, [Remainder] string comment = null)
         {
             if (ApplicationConfig.Settings.ContainsKey(Context.User.Id))
             {
@@ -196,6 +196,7 @@ namespace AcidChicken.Samurai.Modules
             {
                 ApplicationConfig.Settings.Add(Context.User.Id, new Dictionary<string, string>(){ { key, value } });
             }
+            return Task.CompletedTask;
         }
 
         [Command("stop"), Summary("Botを安全に終了します。")]

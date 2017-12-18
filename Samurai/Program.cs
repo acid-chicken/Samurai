@@ -90,7 +90,7 @@ namespace AcidChicken.Samurai
         public static async Task SaveBotConfigAsync()
         {
             ApplicationConfig.Monitors = MonitorManager.Targets.Zip(MonitorManager.Statuses, (x, y) => new KeyValuePair<string, Monitor>(x.Key, new Monitor(x.Value, y.Value))).ToDictionary(x => x.Key, x => x.Value);
-            ApplicationConfig.Queue = TippingManager.Queue.ToList();
+            ApplicationConfig.Queue = TippingManager.Queue.ToDictionary(x => x.Key, x => x.Value);
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 
