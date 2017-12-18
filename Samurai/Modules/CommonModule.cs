@@ -19,7 +19,7 @@ namespace AcidChicken.Samurai.Modules
     public class CommonModule : ModuleBase
     {
         [Command("help"), Summary("コマンドのヘルプを表示します。"), Alias("ヘルプ", "?")]
-        public async Task HelpAsync([Remainder, Summary("対象のコマンド")] string name = null)
+        public async Task HelpAsync([Summary("対象のコマンド")] string name = null, [Remainder] string comment = null)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -113,7 +113,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("prefix"), Summary("プレフィックスを設定します。"), RequireContext(ContextType.Guild)]
-        public async Task PrefixAsync([Summary("新しいプレフィックス")] string prefix)
+        public async Task PrefixAsync([Summary("新しいプレフィックス")] string prefix, [Remainder] string comment = null)
         {
             if (ApplicationConfig.Managers.Contains(Context.User.Id))
             {
@@ -161,7 +161,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("save"), Summary("Botの最新状態を安全に保存します。")]
-        public async Task SaveAsync()
+        public async Task SaveAsync([Remainder] string comment = null)
         {
             await SaveBotConfigAsync().ConfigureAwait(false);
             await ReplyAsync
@@ -179,7 +179,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("stop"), Summary("Botを安全に終了します。")]
-        public async Task StopAsync()
+        public async Task StopAsync([Remainder] string comment = null)
         {
             if (ApplicationConfig.Managers.Contains(Context.User.Id))
             {
@@ -216,7 +216,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("version"), Summary("バージョン情報を表示します。"), Alias("ver")]
-        public async Task VersionAsync()
+        public async Task VersionAsync([Remainder] string comment = null)
         {
             var assembly = Assembly.GetEntryAssembly();
             await ReplyAsync

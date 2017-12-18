@@ -16,7 +16,7 @@ namespace AcidChicken.Samurai.Modules
     public class NotificationModule : ModuleBase
     {
         [Command("add"), Summary("通知チャンネルを追加します。"), Alias("create", "+")]
-        public async Task AddAsync([Summary("対象のチャンネル")] ITextChannel channel)
+        public async Task AddAsync([Summary("対象のチャンネル")] ITextChannel channel, [Remainder] string comment = null)
         {
             if (NotificationManager.Channels.Add((SocketTextChannel)channel))
             {
@@ -55,7 +55,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("delete"), Summary("通知チャンネルを削除します。"), Alias("remove", "rm", "-")]
-        public async Task DeleteAsync([Summary("対象のチャンネル")] ITextChannel channel)
+        public async Task DeleteAsync([Summary("対象のチャンネル")] ITextChannel channel, [Remainder] string comment = null)
         {
             if (NotificationManager.Channels.Remove((SocketTextChannel)channel))
             {
@@ -94,7 +94,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("information"), Summary("通知チャンネルの情報を表示します。"), Alias("info", "show", "lookup")]
-        public async Task InformationAsync()
+        public async Task InformationAsync([Remainder] string comment = null)
         {
             await ReplyAsync
             (

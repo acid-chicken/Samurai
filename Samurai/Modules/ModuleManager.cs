@@ -46,7 +46,8 @@ namespace AcidChicken.Samurai.Modules
                     ApplicationConfig.PrefixOverrides[guildChannel.GuildId] :
                     Prefix,
                     ref position
-                ))) return;
+                )) ||
+                (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))) return;
             var context = new CommandContext(DiscordClient, message);
             var result = await Service.ExecuteAsync(context, position);
             if (!result.IsSuccess)
