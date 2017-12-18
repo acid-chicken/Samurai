@@ -178,6 +178,26 @@ namespace AcidChicken.Samurai.Modules
             ).ConfigureAwait(false);
         }
 
+        [Command("set"), Summary("ユーザー設定を編集します。")]
+        public async Task SetAsync([Summary("設定キー")] string key, [Summary("設定値")] string value, [Remainder] string comment = null)
+        {
+            if (ApplicationConfig.Settings.ContainsKey(Context.User.Id))
+            {
+                if (ApplicationConfig.Settings[Context.User.Id].ContainsKey(key))
+                {
+                    ApplicationConfig.Settings[Context.User.Id][key] = value;
+                }
+                else
+                {
+                    ApplicationConfig.Settings[Context.User.Id].Add(key, value);
+                }
+            }
+            else
+            {
+                ApplicationConfig.Settings.Add(Context.User.Id, new Dictionary<string, string>(){ { key, value } });
+            }
+        }
+
         [Command("stop"), Summary("Botを安全に終了します。")]
         public async Task StopAsync([Remainder] string comment = null)
         {

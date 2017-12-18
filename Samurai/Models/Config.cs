@@ -8,6 +8,9 @@ namespace AcidChicken.Samurai.Models
     [JsonObject]
     public class Config
     {
+        [JsonProperty("default_settings")]
+        public Dictionary<string, string> DefaultSettings { get; set; } = new Dictionary<string, string>();
+
         [JsonProperty("discord_token")]
         public string DiscordToken { get; set; } = "";
 
@@ -37,6 +40,9 @@ namespace AcidChicken.Samurai.Models
 
         [JsonProperty("targets")]
         public Dictionary<string, Monitor> Monitors { get; set; } = new Dictionary<string, Monitor>();
+
+        [JsonProperty("user_settings")]
+        public Dictionary<ulong, Dictionary<string, string>> Settings { get; set; } = new Dictionary<ulong, Dictionary<string, string>>();
     }
 
     [JsonObject]

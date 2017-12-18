@@ -22,6 +22,8 @@ namespace AcidChicken.Samurai.Modules
             Service = new CommandService();
         }
 
+        public static bool IsModuleHandleLocked { get; set; }
+
         public static CommandService Service { get; }
 
         public static CommandServiceConfig ServiceConfig { get; }
@@ -49,21 +51,41 @@ namespace AcidChicken.Samurai.Modules
                 )) ||
                 (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))) return;
             var context = new CommandContext(DiscordClient, message);
-            var result = await Service.ExecuteAsync(context, position);
-            if (!result.IsSuccess)
+            if (IsModuleHandleLocked)
             {
                 await context.Channel.SendMessageAsync
                 (
                     text: context.User.Mention,
                     embed:
                         new EmbedBuilder()
-                            .WithTitle("コマンドエラー")
-                            .WithDescription(result.ErrorReason)
+                            .WithTitle("コマンドスキップ")
+                            .WithDescription("現在Botが混み合っています。時間を空けてから再度お試し下さい。")
                             .WithCurrentTimestamp()
-                            .WithColor(Colors.Red)
+                            .WithColor(Colors.Orange)
                             .WithFooter(EmbedManager.CurrentFooter)
                             .WithAuthor(context.User)
                 );
+            }
+            else
+            {
+                IsModuleHandleLocked = true;
+                var result = await Service.ExecuteAsync(context, position);
+                if (!result.IsSuccess)
+                {
+                    await context.Channel.SendMessageAsync
+                    (
+                        text: context.User.Mention,
+                        embed:
+                            new EmbedBuilder()
+                                .WithTitle("コマンドエラー")
+                                .WithDescription(result.ErrorReason)
+                                .WithCurrentTimestamp()
+                                .WithColor(Colors.Red)
+                                .WithFooter(EmbedManager.CurrentFooter)
+                                .WithAuthor(context.User)
+                    );
+                }
+                IsModuleHandleLocked = false;
             }
         }
     }
