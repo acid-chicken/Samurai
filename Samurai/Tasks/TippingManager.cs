@@ -23,12 +23,14 @@ namespace AcidChicken.Samurai.Tasks
 
         public static Task<bool> DequeueAsync(ulong id, TipQueue queue)
         {
+            if (Queue.ContainsKey(id)) Queue.Add(id, new List<TipQueue>());
             Queue[id].RemoveAll(x => x == null);
             return Task.FromResult(Queue[id].Remove(queue));
         }
 
         public static Task EnqueueAsync(ulong id, TipQueue queue)
         {
+            if (Queue.ContainsKey(id)) Queue.Add(id, new List<TipQueue>());
             Queue[id].Add(queue);
             Queue[id].RemoveAll(x => x == null);
             return Task.CompletedTask;
