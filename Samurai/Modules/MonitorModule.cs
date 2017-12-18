@@ -18,7 +18,7 @@ namespace AcidChicken.Samurai.Modules
     public class MonitorModule : ModuleBase
     {
         [Command("add"), Summary("モニターを追加します。"), Alias("create", "+")]
-        public async Task AddAsync([Summary("モニターの名前")] string name, [Remainder, Summary("モニターのホスト名")] string hostname)
+        public async Task AddAsync([Summary("モニターの名前")] string name, [Summary("モニターのホスト名")] string hostname, [Remainder] string comment = null)
         {
             if (MonitorManager.AddMonitor(name, hostname) && ApplicationConfig.Monitors.TryAdd(name, new Monitor(hostname)))
             {
@@ -74,7 +74,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("delete"), Summary("モニターを削除します。"), Alias("remove", "-")]
-        public async Task DeleteAsync([Remainder, Summary("削除するモニター")] string name)
+        public async Task DeleteAsync([Summary("削除するモニター")] string name, [Remainder] string comment = null)
         {
             if (MonitorManager.DeleteMonitor(name) && ApplicationConfig.Monitors.Remove(name))
             {
@@ -127,7 +127,7 @@ namespace AcidChicken.Samurai.Modules
         }
 
         [Command("information"), Summary("モニターの情報を表示します。"), Alias("info", "show", "lookup")]
-        public async Task InformationAsync([Remainder, Summary("対象のモニター")] string name = null)
+        public async Task InformationAsync([Summary("対象のモニター")] string name = null, [Remainder] string comment = null)
         {
             if (string.IsNullOrEmpty(name))
             {
