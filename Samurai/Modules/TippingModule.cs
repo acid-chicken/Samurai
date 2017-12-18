@@ -23,21 +23,28 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var earned = decimal.Zero;
-            await Task.WhenAll(TippingManager.Queue.Where(x => x.To == Context.User.Id).Select(async x =>
+            try
             {
-                try
+                await Task.WhenAll(TippingManager.Queue.Where(x => x.To == Context.User.Id).Select(async x =>
                 {
-                    earned += x.Amount;
-                    var from = DiscordClient.GetUser(x.From);
-                    var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
-                    var dequeued = await TippingManager.DequeueAsync(x).ConfigureAwait(false);
-                    await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
-                }
-                catch (Exception ex)
-                {
-                    await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
-                }
-            }));
+                    try
+                    {
+                        earned += x.Amount;
+                        var from = DiscordClient.GetUser(x.From);
+                        var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
+                        var dequeued = await TippingManager.DequeueAsync(x).ConfigureAwait(false);
+                        await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
+                    }
+                    catch (Exception ex)
+                    {
+                        await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
+                    }
+                }));
+            }
+            catch (NullReferenceException ex)
+            {
+                await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
+            }
             var balance0 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false));
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
             var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
