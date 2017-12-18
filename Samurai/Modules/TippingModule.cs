@@ -100,7 +100,7 @@ namespace AcidChicken.Samurai.Modules
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
-                var amount = totalAmount / targets.Count;
+                var amount = Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
                 await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, x.Id, limit, amount))).Append(ReplyAsync
                 (
