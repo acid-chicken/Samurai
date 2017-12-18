@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -23,6 +24,8 @@ namespace AcidChicken.Samurai
 
         public static HttpClient BitZenyClient { get; set; }
 
+        public static CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
+
         public static DiscordSocketClient DiscordClient { get; set; }
 
         public static DiscordSocketConfig DiscordClientConfig { get; set; }
@@ -38,7 +41,6 @@ namespace AcidChicken.Samurai
             if (File.Exists(ConfigurePath))
             {
                 ApplicationConfig = await LoadConfigAsync().ConfigureAwait(false);
-                AppDomain.CurrentDomain.ProcessExit += (sender, e) => SaveBotConfigAsync().RunSynchronously();
             }
             else
             {
@@ -59,7 +61,10 @@ namespace AcidChicken.Samurai
             await DiscordClient.LoginAsync(TokenType.Bot, ApplicationConfig.DiscordToken).ConfigureAwait(false);
             await DiscordClient.StartAsync().ConfigureAwait(false);
 
-            await Task.Delay(-1).ConfigureAwait(false);
+            while (!CancellationTokenSource.Token.IsCancellationRequested)
+            {
+                await Task.Delay(1024).ConfigureAwait(false);
+            }
         }
 
         public static async Task<Config> LoadConfigAsync(string path = ConfigurePath)

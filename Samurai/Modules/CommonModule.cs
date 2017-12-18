@@ -130,6 +130,43 @@ namespace AcidChicken.Samurai.Modules
             ).ConfigureAwait(false);
         }
 
+        [Command("stop"), Summary("Botを安全に終了します。")]
+        public async Task StopAsync()
+        {
+            if (ApplicationConfig.Managers.Contains(Context.User.Id))
+            {
+                await SaveBotConfigAsync().ConfigureAwait(false);
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("終了準備完了")
+                            .WithDescription("Botを終了する準備が完了しました。Botを終了しています。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Green)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
+                CancellationTokenSource.Cancel();
+            }
+            else
+            {
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("終了準備失敗")
+                            .WithDescription("Botを終了する権限がありません。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Red)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
+            }
+        }
+
         [Command("version"), Summary("バージョン情報を表示します。"), Alias("ver")]
         public async Task VersionAsync()
         {

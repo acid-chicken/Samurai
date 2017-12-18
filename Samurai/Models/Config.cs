@@ -14,6 +14,9 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("last_posts")]
         public Dictionary<ulong, Dictionary<ulong, DateTimeOffset>> LastPosts { get; set; } = new Dictionary<ulong, Dictionary<ulong, DateTimeOffset>>();
 
+        [JsonProperty("managers")]
+        public HashSet<ulong> Managers { get; set; } = new HashSet<ulong>();
+
         [JsonProperty("notification_channels")]
         public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
