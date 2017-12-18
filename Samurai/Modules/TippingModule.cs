@@ -36,8 +36,8 @@ namespace AcidChicken.Samurai.Modules
                     await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
                 }
             }));
-            var balance0 = await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false);
-            var balance1 = await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false);
+            var balance0 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false));
+            var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
             var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
@@ -50,8 +50,8 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("利用可能", $"{decimal.Parse(balance0) - queued:N8} ZNY")
-                        .AddInlineField("検証待ち", $"{balance1} ZNY")
+                        .AddInlineField("利用可能", $"{balance0 - queued:N8} ZNY")
+                        .AddInlineField("検証待ち", $"{balance1 - balance0:N8} ZNY")
                         .AddInlineField("受取待ち", $"{queued:N8} ZNY")
             ).ConfigureAwait(false);
         }
