@@ -12,6 +12,8 @@ namespace AcidChicken.Samurai.Modules
     using static Program;
     using Assets;
     using Components;
+    using Models;
+    using Tasks;
 
     [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase
@@ -108,6 +110,24 @@ namespace AcidChicken.Samurai.Modules
                     ).ConfigureAwait(false);
                 }
             }
+        }
+
+        [Command("save"), Summary("Botの最新状態を安全に保存します。")]
+        public async Task SaveAsync()
+        {
+            await SaveBotConfigAsync().ConfigureAwait(false);
+            await ReplyAsync
+            (
+                message: Context.User.Mention,
+                embed:
+                    new EmbedBuilder()
+                        .WithTitle("保存完了")
+                        .WithDescription("最新のデータを全て保存しました。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Green)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(Context.User)
+            ).ConfigureAwait(false);
         }
 
         [Command("version"), Summary("バージョン情報を表示します。"), Alias("ver")]
