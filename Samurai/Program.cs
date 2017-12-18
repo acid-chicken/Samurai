@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
@@ -36,7 +38,7 @@ namespace AcidChicken.Samurai
             if (File.Exists(ConfigurePath))
             {
                 ApplicationConfig = await LoadConfigAsync().ConfigureAwait(false);
-                AppDomain.CurrentDomain.ProcessExit += (sender, e) => SaveConfigAsync(ApplicationConfig).RunSynchronously();
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) => SaveBotConfigAsync().RunSynchronously();
             }
             else
             {
@@ -62,11 +64,6 @@ namespace AcidChicken.Samurai
 
         public static async Task<Config> LoadConfigAsync(string path = ConfigurePath)
         {
-            while (IsConfigLocked)
-            {
-                await Task.Delay(1).ConfigureAwait(false);
-            }
-            IsConfigLocked = true;
             Config result;
             try
             {
@@ -82,17 +79,18 @@ namespace AcidChicken.Samurai
                 await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
-            IsConfigLocked = false;
             return result;
+        }
+
+        public static async Task SaveBotConfigAsync()
+        {
+            ApplicationConfig.Monitors = MonitorManager.Targets.Zip(MonitorManager.Statuses, (x, y) => new KeyValuePair<string, Monitor>(x.Key, new Monitor(x.Value, y.Value))).ToDictionary(x => x.Key, x => x.Value);
+            ApplicationConfig.Queue = TippingManager.Queue;
+            await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 
         public static async Task SaveConfigAsync(Config config, string path = ConfigurePath)
         {
-            while (IsConfigLocked)
-            {
-                await Task.Delay(1).ConfigureAwait(false);
-            }
-            IsConfigLocked = true;
             try
             {
                 using (var stream = File.OpenWrite(path))
@@ -107,7 +105,6 @@ namespace AcidChicken.Samurai
                 await RequestLogAsync(new LogMessage(LogSeverity.Error, "Program", ex.Message, ex)).ConfigureAwait(false);
                 throw;
             }
-            IsConfigLocked = false;
         }
 
         public static async Task LogAsync(LogMessage message)
