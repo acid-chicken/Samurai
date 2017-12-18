@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,16 +19,18 @@ namespace AcidChicken.Samurai.Tasks
 
     public static class TippingManager
     {
-        public static ConcurrentBag<TipQueue> Queue { get; set; } = new ConcurrentBag<TipQueue>();
+        public static List<TipQueue> Queue { get; set; } = new List<TipQueue>();
 
         public static Task<bool> DequeueAsync(TipQueue queue)
         {
-            return Task.FromResult(Queue.TryTake(out queue));
+            Queue.RemoveAll(x => x == null);
+            return Task.FromResult(Queue.Remove(queue));
         }
 
         public static Task EnqueueAsync(TipQueue queue)
         {
             Queue.Add(queue);
+            Queue.RemoveAll(x => x == null);
             return Task.CompletedTask;
         }
 
