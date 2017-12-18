@@ -50,8 +50,8 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("利用可能", $"{balance0 - queued:N8} ZNY")
-                        .AddInlineField("検証待ち", $"{balance1 - balance0:N8} ZNY")
+                        .AddInlineField("利用可能", $"{balance1 - queued:N8} ZNY")
+                        .AddInlineField("検証待ち", $"{balance0 - balance1:N8} ZNY")
                         .AddInlineField("受取待ち", $"{queued:N8} ZNY")
             ).ConfigureAwait(false);
         }
