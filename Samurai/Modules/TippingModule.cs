@@ -36,7 +36,8 @@ namespace AcidChicken.Samurai.Modules
                     await RequestLogAsync(new LogMessage(LogSeverity.Error, "TippingModule", ex.Message, ex));
                 }
             }));
-            var balance = await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false);
+            var balance0 = await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false);
+            var balance1 = await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false);
             var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
@@ -44,12 +45,13 @@ namespace AcidChicken.Samurai.Modules
                 embed:
                     new EmbedBuilder()
                         .WithTitle("残高")
-                        .WithDescription($"{balance} ZNY")
+                        .WithDescription($"{balance0} ZNY")
                         .WithCurrentTimestamp()
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("利用可能", $"{decimal.Parse(balance) - queued:N8} ZNY")
+                        .AddInlineField("利用可能", $"{decimal.Parse(balance0) - queued:N8} ZNY")
+                        .AddInlineField("検証待ち", $"{balance1} ZNY")
                         .AddInlineField("受取待ち", $"{queued:N8} ZNY")
             ).ConfigureAwait(false);
         }
@@ -72,7 +74,7 @@ namespace AcidChicken.Samurai.Modules
             ).ConfigureAwait(false);
         }
 
-        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
+        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。端数で総金額が多少変動することがあります。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
         public async Task RainAsync([Summary("金額")] decimal totalAmount)
         {
             var targets =
@@ -96,6 +98,7 @@ namespace AcidChicken.Samurai.Modules
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = totalAmount / targets.Count;
+                var count = targets.Count;
                 await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, x.Id, limit, amount))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -108,8 +111,8 @@ namespace AcidChicken.Samurai.Modules
                             .WithFooter(EmbedManager.CurrentFooter)
                             .WithAuthor(Context.User)
                             .AddInlineField("一人あたりの金額", $"{amount:N8} ZNY")
-                            .AddInlineField("対象者数", $"{targets.Count} 人")
-                            .AddInlineField("総金額", $"{totalAmount:N8} ZNY")
+                            .AddInlineField("対象者数", $"{count} 人")
+                            .AddInlineField("総金額", $"{amount * count:N8} ZNY")
                 ))).ConfigureAwait(false);
             }
             else
