@@ -34,7 +34,7 @@ namespace AcidChicken.Samurai.Tasks
             return Task.CompletedTask;
         }
 
-        public static Task<string> EnsureAccountAsync(string account) => TippingManager.InvokeMethodAsync("getaccountaddress", account);
+        public static Task<string> EnsureAccountAsync(string account) => InvokeMethodAsync("getaccountaddress", account);
 
         public static string GetAccountName(IUser user) => $"discord:{user.Id}";
 

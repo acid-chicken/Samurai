@@ -12,6 +12,7 @@ namespace AcidChicken.Samurai.Modules
     using static Program;
     using Assets;
     using Components;
+    using Models;
     using Tasks;
 
     [Group(""), Summary("投げ銭モジュールです。")]
@@ -23,6 +24,7 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var earned = decimal.Zero;
+            if (!TippingManager.Queue.ContainsKey(Context.User.Id)) TippingManager.Queue.Add(Context.User.Id, new List<TipQueue>());
             await Task.WhenAll(TippingManager.Queue[Context.User.Id].ToList().Select(async x =>
             {
                 try
@@ -118,7 +120,7 @@ namespace AcidChicken.Samurai.Modules
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
-                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(x.Id, new Models.TipQueue(Context.User.Id, limit, amount))).Append(ReplyAsync
+                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(x.Id, new TipQueue(Context.User.Id, limit, amount))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
                     embed:
@@ -206,7 +208,7 @@ namespace AcidChicken.Samurai.Modules
             if (amount > 0 && amount < balance1/* - queued*/)
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
-                await TippingManager.EnqueueAsync(user.Id, new Models.TipQueue(Context.User.Id, limit, amount));
+                await TippingManager.EnqueueAsync(user.Id, new TipQueue(Context.User.Id, limit, amount));
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
