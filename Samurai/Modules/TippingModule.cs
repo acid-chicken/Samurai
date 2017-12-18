@@ -22,10 +22,12 @@ namespace AcidChicken.Samurai.Modules
         {
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
+            var earned = decimal.Zero;
             await Task.WhenAll(TippingManager.Queue.Where(x => x.To == Context.User.Id).Select(async x =>
             {
                 try
                 {
+                    earned += x.Amount;
                     var from = DiscordClient.GetUser(x.From);
                     var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
                     var dequeued = await TippingManager.DequeueAsync(x).ConfigureAwait(false);
@@ -53,6 +55,7 @@ namespace AcidChicken.Samurai.Modules
                         .AddInlineField("利用可能", $"{balance1 - queued:N8} ZNY")
                         .AddInlineField("検証待ち", $"{balance0 - balance1:N8} ZNY")
                         .AddInlineField("受取待ち", $"{queued:N8} ZNY")
+                        .AddInlineField("このコマンドで受け取った投げ銭", $"{earned:N8} ZNY")
             ).ConfigureAwait(false);
         }
 
