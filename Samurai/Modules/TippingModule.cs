@@ -23,7 +23,7 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var earned = decimal.Zero;
-            await Task.WhenAll(TippingManager.Queue.Where(x => x.To == Context.User.Id).Select(async x =>
+            await Task.WhenAll(TippingManager.Queue.ToList().Where(x => x.To == Context.User.Id).Select(async x =>
             {
                 try
                 {
@@ -40,7 +40,7 @@ namespace AcidChicken.Samurai.Modules
             }));
             var balance0 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false));
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-            var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
+            var queued = TippingManager.Queue.ToList().Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -75,11 +75,22 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
             ).ConfigureAwait(false);
+            if (ApplicationConfig.Settings.ContainsKey(Context.User.Id) && ApplicationConfig.Settings[Context.User.Id].ContainsKey("mode_android") ?
+                ApplicationConfig.Settings[Context.User.Id]["mode_android"] == "1" :
+                ApplicationConfig.DefaultSettings.ContainsKey("mode_android") && ApplicationConfig.DefaultSettings["mode_android"] == "1")
+            {
+                await ReplyAsync($"```{address}```");
+            }
         }
 
         [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。端数で総金額が多少変動することがあります。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
-        public async Task RainAsync([Summary("金額")] decimal totalAmount, [Remainder] string comment = null)
+        public async Task RainAsync([Summary("金額")] decimal totalAmount = decimal.MinusOne, [Remainder] string comment = null)
         {
+            if (totalAmount == decimal.MinusOne)
+            {
+                var random = new Random();
+                totalAmount = (decimal)Math.Pow(10, random.NextDouble()) - 1;
+            }
             var targets =
                 JsonConvert
                     .DeserializeObject<Dictionary<string, decimal>>(await TippingManager.InvokeMethodAsync("listaccounts").ConfigureAwait(false))
@@ -100,7 +111,7 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-            var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
+            var queued = TippingManager.Queue.ToList().Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
             if (targets.Any() && totalAmount > 0 && totalAmount < balance1 - queued)
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
