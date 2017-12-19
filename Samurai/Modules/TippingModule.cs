@@ -54,7 +54,6 @@ namespace AcidChicken.Samurai.Modules
                         .WithColor(Colors.Blue)
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
-                        .AddInlineField("利用可能", $"{balance1:N8} ZNY")
                         .AddInlineField("利用可能", $"{balance1 - queued:N8} ZNY")
                         .AddInlineField("検証待ち", $"{balance0 - balance1:N8} ZNY")
                         .AddInlineField("受取待ち", $"{queued:N8} ZNY")
@@ -86,7 +85,7 @@ namespace AcidChicken.Samurai.Modules
             }
         }
 
-        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。端数で総金額が多少変動することがあります。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
+        [Command("rain"), Summary("条件を満たしたユーザー全員に均等に投げ銭します。端数で総金額が多少変動することがあります。末尾に`powerful`をつけると、総金額ではなく一人あたりに投げ銭される金額を指定したことになります。"), Alias("撒金"), RequireContext(ContextType.Guild | ContextType.Group)]
         public async Task RainAsync([Summary("金額")] decimal totalAmount = decimal.MinusOne, [Remainder] string comment = null)
         {
             if (totalAmount == decimal.MinusOne)
@@ -114,7 +113,7 @@ namespace AcidChicken.Samurai.Modules
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
-                var amount = Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
+                var amount = comment?.ToLower()?.Contains("powerful") ?? false ? totalAmount : Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
                 await Task.WhenAll(targets.Select(x => TippingManager.AddRequestAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
                 (
