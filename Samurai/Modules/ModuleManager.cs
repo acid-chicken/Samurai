@@ -49,21 +49,24 @@ namespace AcidChicken.Samurai.Modules
                 )) ||
                 (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))) return;
             var context = new CommandContext(DiscordClient, message);
-            var result = await Service.ExecuteAsync(context, position);
-            if (!result.IsSuccess)
+            using (var typing = context.Channel.EnterTypingState())
             {
-                await context.Channel.SendMessageAsync
-                (
-                    text: context.User.Mention,
-                    embed:
-                        new EmbedBuilder()
-                            .WithTitle("コマンドエラー")
-                            .WithDescription(result.ErrorReason)
-                            .WithCurrentTimestamp()
-                            .WithColor(Colors.Red)
-                            .WithFooter(EmbedManager.CurrentFooter)
-                            .WithAuthor(context.User)
-                );
+                var result = await Service.ExecuteAsync(context, position);
+                if (!result.IsSuccess)
+                {
+                    await context.Channel.SendMessageAsync
+                    (
+                        text: context.User.Mention,
+                        embed:
+                            new EmbedBuilder()
+                                .WithTitle("コマンドエラー")
+                                .WithDescription(result.ErrorReason)
+                                .WithCurrentTimestamp()
+                                .WithColor(Colors.Red)
+                                .WithFooter(EmbedManager.CurrentFooter)
+                                .WithAuthor(context.User)
+                    );
+                }
             }
         }
     }
