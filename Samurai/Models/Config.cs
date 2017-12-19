@@ -8,6 +8,9 @@ namespace AcidChicken.Samurai.Models
     [JsonObject]
     public class Config
     {
+        [JsonProperty("busy")]
+        public ulong Busy { get; set; } = ulong.MaxValue;
+
         [JsonProperty("default_settings")]
         public Dictionary<string, string> DefaultSettings { get; set; } = new Dictionary<string, string>();
 

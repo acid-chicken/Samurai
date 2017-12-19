@@ -90,8 +90,7 @@ namespace AcidChicken.Samurai.Modules
         {
             if (totalAmount == decimal.MinusOne)
             {
-                var random = new Random();
-                totalAmount = (decimal)Math.Pow(10, random.NextDouble()) - 1;
+                totalAmount = (decimal)Math.Pow(10, Random.NextDouble()) - 1;
             }
             var targets =
                 JsonConvert

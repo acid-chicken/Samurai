@@ -16,6 +16,8 @@ namespace AcidChicken.Samurai.Modules
     {
         public const string Prefix = "./";
 
+        public static ulong Busy;
+
         static ModuleManager()
         {
             ServiceConfig = new CommandServiceConfig();
@@ -51,23 +53,43 @@ namespace AcidChicken.Samurai.Modules
             var context = new CommandContext(DiscordClient, message);
             using (var typing = context.Channel.EnterTypingState())
             {
-                var result = await Service.ExecuteAsync(context, position);
-                if (!result.IsSuccess)
+                if (++Busy > ApplicationConfig.Busy)
                 {
                     await context.Channel.SendMessageAsync
                     (
                         text: context.User.Mention,
                         embed:
                             new EmbedBuilder()
-                                .WithTitle("コマンドエラー")
-                                .WithDescription(result.ErrorReason)
+                                .WithTitle("ビジー状態")
+                                .WithDescription("現在Botが混み合っています。時間を空けてから再度お試し下さい。")
                                 .WithCurrentTimestamp()
+                                .WithColor(Colors.Orange)
                                 .WithColor(Colors.Red)
                                 .WithFooter(EmbedManager.CurrentFooter)
                                 .WithAuthor(context.User)
                     );
                 }
+                else
+                {
+                    var result = await Service.ExecuteAsync(context, position);
+                    if (!result.IsSuccess)
+                    {
+                        await context.Channel.SendMessageAsync
+                        (
+                            text: context.User.Mention,
+                            embed:
+                                new EmbedBuilder()
+                                    .WithTitle("コマンドエラー")
+                                    .WithDescription(result.ErrorReason)
+                                    .WithCurrentTimestamp()
+                                    .WithColor(Colors.Red)
+                                    .WithFooter(EmbedManager.CurrentFooter)
+                                    .WithAuthor(context.User)
+                        );
+                    }
+                }
             }
+            Busy--;
         }
     }
 }
