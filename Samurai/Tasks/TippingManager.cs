@@ -9,30 +9,28 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
+using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
+    using Components;
     using Models;
 
     public static class TippingManager
     {
-        public static Dictionary<ulong, List<TipQueue>> Queue { get; set; } = new Dictionary<ulong, List<TipQueue>>();
+        public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
 
-        public static Task<bool> DequeueAsync(ulong id, TipQueue queue)
-        {
-            if (!Queue.ContainsKey(id)) Queue.Add(id, new List<TipQueue>());
-            Queue[id].RemoveAll(x => x == null);
-            return Task.FromResult(Queue[id].Remove(queue));
-        }
+        public static Task<bool> DequeueAsync(BsonValue value) => Task.FromResult(GetCollection().Delete(value));
 
-        public static Task EnqueueAsync(ulong id, TipQueue queue)
+        public static Task EnqueueAsync(TipRequest queue)
         {
-            if (!Queue.ContainsKey(id)) Queue.Add(id, new List<TipQueue>());
-            Queue[id].Add(queue);
-            Queue[id].RemoveAll(x => x == null);
+            var collection = GetCollection();
+            collection.Insert(queue);
+            collection.EnsureIndex(x => x.From);
+            collection.EnsureIndex(x => x.To);
             return Task.CompletedTask;
         }
 
@@ -61,14 +59,6 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token = default)
         {
-            Queue = Queue.ToList().Union(ApplicationConfig.Queue).ToDictionary(x => x.Key, x => x.Value);
-            BitZenyClient = new HttpClient()
-            {
-                BaseAddress = new Uri(ApplicationConfig.RpcServer),
-                Timeout = Timeout.InfiniteTimeSpan
-            };
-            BitZenyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{ApplicationConfig.RpcUser}:{ApplicationConfig.RpcPassword}")));
-
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll
@@ -82,7 +72,7 @@ namespace AcidChicken.Samurai.Tasks
 
         public static Task CheckQueueAsync()
         {
-            Queue.Select(user => user.Value.RemoveAll(x => x == null || x.Limit < DateTimeOffset.Now));
+            GetCollection().Delete(x => x.Limit < DateTimeOffset.Now);
             return Task.CompletedTask;
         }
     }

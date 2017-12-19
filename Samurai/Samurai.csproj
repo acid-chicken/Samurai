@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="System.Net.Ping" Version="4.3.0" />
     <PackageReference Include="Discord.Net" Version="1.0.2" />
+    <PackageReference Include="LiteDB" Version="4.1.0" />
   </ItemGroup>
 
 </Project>

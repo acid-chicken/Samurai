@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
@@ -24,15 +25,14 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var earned = decimal.Zero;
-            if (!TippingManager.Queue.ContainsKey(Context.User.Id)) TippingManager.Queue.Add(Context.User.Id, new List<TipQueue>());
-            await Task.WhenAll(TippingManager.Queue[Context.User.Id].ToList().Select(async x =>
+            await Task.WhenAll(TippingManager.GetCollection().Find(x => x.To == Context.User.Id).Select(async x =>
             {
                 try
                 {
                     earned += x.Amount;
                     var from = DiscordClient.GetUser(x.From);
                     var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
-                    while (!await TippingManager.DequeueAsync(Context.User.Id, x).ConfigureAwait(false));
+                    var dequeued = await TippingManager.DequeueAsync(x.Id).ConfigureAwait(false);
                     await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
                 }
                 catch (Exception ex)
@@ -42,7 +42,7 @@ namespace AcidChicken.Samurai.Modules
             }));
             var balance0 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false));
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-        //  var queued = TippingManager.Queue.ToList().Select(userQueue => userQueue.Value.Where(x => x.From == Context.User.Id).Sum(x => x.Amount)).Sum();
+            var queued = TippingManager.GetCollection().Find(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -105,22 +105,18 @@ namespace AcidChicken.Samurai.Modules
                             .GetUsersAsync()
                             .Flatten()
                             .Result
-                                .Select(x => x.Id)
-                                .Contains(ulong.TryParse(new string(user.Key.Skip(8).ToArray()), out ulong result) ? result : 0)
+                                .Where(x => x.Id != Context.User.Id)
+                                .Select(x => $"discord:{x.Id}")
+                                .Contains(user.Key)
                     )
                     .Select(x => (IUser)DiscordClient.GetUser(ulong.TryParse(new string(x.Key.Skip(8).ToArray()), out ulong result) ? result : 0))
                     .ToHashSet();
-            targets.Remove(Context.User);
-            var account = TippingManager.GetAccountName(Context.User);
-            await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
-            var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-        //  var queued = TippingManager.Queue.ToList().Select(userQueue => userQueue.Value.Where(x => x.From == Context.User.Id).Sum(x => x.Amount)).Sum();
-            if (targets.Any() && totalAmount > 0 && totalAmount < balance1/* - queued */)
+            if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
-                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(x.Id, new TipQueue(Context.User.Id, limit, amount))).Append(ReplyAsync
+                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
                     embed:
@@ -201,46 +197,39 @@ namespace AcidChicken.Samurai.Modules
         [Command("tip"), Summary("指定されたユーザーに投げ銭します。"), Alias("投銭")]
         public async Task TipAsync([Summary("送り先のユーザー")] IUser user, [Summary("金額")] decimal amount, [Remainder] string comment = null)
         {
-            var account = TippingManager.GetAccountName(Context.User);
-            await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
-            var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-        //  var queued = TippingManager.Queue.ToList().Select(userQueue => userQueue.Value.Where(x => x.From == Context.User.Id).Sum(x => x.Amount)).Sum();
-            if (amount > 0 && amount < balance1/* - queued*/)
-            {
-                var limit = DateTimeOffset.Now.AddDays(3);
-                await TippingManager.EnqueueAsync(user.Id, new TipQueue(Context.User.Id, limit, amount));
-                await ReplyAsync
-                (
-                    message: Context.User.Mention,
-                    embed:
-                        new EmbedBuilder()
-                            .WithTitle("投げ銭完了")
-                            .WithDescription($"{user.Mention} に投げ銭を行いました。")
-                            .WithCurrentTimestamp()
-                            .WithColor(Colors.Green)
-                            .WithFooter(EmbedManager.CurrentFooter)
-                            .WithAuthor(Context.User)
-                            .WithThumbnailUrl(user.GetAvatarUrl())
-                            .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("受取期限", limit)
-                ).ConfigureAwait(false);
-                var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
-                await dm.SendMessageAsync
-                (
-                    text: user.Mention,
-                    embed:
-                        new EmbedBuilder()
-                            .WithTitle("投げ銭通知")
-                            .WithDescription($"{Context.User.Mention} から投げ銭が届いています。受取期限までに`{ModuleManager.Prefix}balance`を実行することで投げ銭を受け取れます。")
-                            .WithCurrentTimestamp()
-                            .WithColor(Colors.Orange)
-                            .WithFooter(EmbedManager.CurrentFooter)
-                            .WithAuthor(user)
-                            .WithThumbnailUrl(Context.User.GetAvatarUrl())
-                            .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("受取期限", limit)
-                ).ConfigureAwait(false);
-            }
+            var limit = DateTimeOffset.Now.AddDays(3);
+            await TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, user.Id, amount, limit));
+            await ReplyAsync
+            (
+                message: Context.User.Mention,
+                embed:
+                    new EmbedBuilder()
+                        .WithTitle("投げ銭完了")
+                        .WithDescription($"{user.Mention} に投げ銭を行いました。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Green)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(Context.User)
+                        .WithThumbnailUrl(user.GetAvatarUrl())
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
+                        .AddInlineField("受取期限", limit)
+            ).ConfigureAwait(false);
+            var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
+            await dm.SendMessageAsync
+            (
+                text: user.Mention,
+                embed:
+                    new EmbedBuilder()
+                        .WithTitle("投げ銭通知")
+                        .WithDescription($"{Context.User.Mention} から投げ銭が届いています。受取期限までに`{ModuleManager.Prefix}balance`を実行することで投げ銭を受け取れます。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Orange)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(user)
+                        .WithThumbnailUrl(Context.User.GetAvatarUrl())
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
+                        .AddInlineField("受取期限", limit)
+            ).ConfigureAwait(false);
         }
 
         [Command("withdraw"), Summary("指定されたアドレスに出金します。金額を指定しなかった場合は全額出金されます。"), Alias("出金")]
