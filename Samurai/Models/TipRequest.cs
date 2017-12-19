@@ -1,7 +1,7 @@
 using System;
 using LiteDB;
 
-namespace AcidChicken.Samurai.Models
+namespace AcidChicken.Samurai.Discord.Models
 {
     public class TipRequest
     {

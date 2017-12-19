@@ -16,7 +16,7 @@
     <a href="bitzeny:ZigzVrLu3LjnB1bMqQKJXmvPyKYZAcPESw" target="_blank"><img src="https://img.shields.io/badge/Earned-39408.52606897%20ZNY-blue.svg?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAAGaYQB0AAAAHlBMVEX%2F%2F%2F%2FMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMw6yahhAAAACXRSTlMAQFCQoLDQ4PBnVUN0AAAAaElEQVQI1wXBIQ7CMBiA0W8Jpq51VCJxc8uOMDdF0nsQEo6A%2B0nXke%2B2vEdCdt48PqQgZQzOYA2SznisQS01mNxhVTisO%2F4MXAxGuWeSHdjUDtVbKe2L%2BloU7U%2BV5tVzG1xUnWFqjswfmY0oro8lrF8AAAAASUVORK5CYII%3D" alt="BitZeny earned Widget"></a>
     <a href="https://discord.gg/xmWd3yy" target="_blank"><img src="https://discordapp.com/api/guilds/387920616252243968/widget.png" alt="Discord Widget"></a>
   </div>
-  <p>An Discord bot for BitZeny users.</p>
+  <p>A Discord bot for BitZeny users.</p>
 </div>
 
 ## How to use

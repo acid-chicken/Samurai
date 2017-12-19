@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace AcidChicken.Samurai.Modules
+namespace AcidChicken.Samurai.Discord.Modules
 {
     using static Program;
     using Assets;

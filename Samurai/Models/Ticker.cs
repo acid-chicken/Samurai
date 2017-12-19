@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Models
+namespace AcidChicken.Samurai.Discord.Models
 {
     using Tasks;
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Tasks
+namespace AcidChicken.Samurai.Discord.Tasks
 {
     using static Program;
     using Components;

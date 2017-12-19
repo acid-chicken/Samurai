@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Models
+namespace AcidChicken.Samurai.Discord.Models
 {
     [JsonObject]
     public class Config
