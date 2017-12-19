@@ -163,19 +163,37 @@ namespace AcidChicken.Samurai.Modules
         [Command("save"), Summary("Botの最新状態を安全に保存します。")]
         public async Task SaveAsync([Remainder] string comment = null)
         {
-            await SaveBotConfigAsync().ConfigureAwait(false);
-            await ReplyAsync
-            (
-                message: Context.User.Mention,
-                embed:
-                    new EmbedBuilder()
-                        .WithTitle("保存完了")
-                        .WithDescription("最新のデータを全て保存しました。")
-                        .WithCurrentTimestamp()
-                        .WithColor(Colors.Green)
-                        .WithFooter(EmbedManager.CurrentFooter)
-                        .WithAuthor(Context.User)
-            ).ConfigureAwait(false);
+            if (ApplicationConfig.Managers.Contains(Context.User.Id))
+            {
+                await SaveBotConfigAsync().ConfigureAwait(false);
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("保存完了")
+                            .WithDescription("最新のデータを全て保存しました。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Green)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
+            }
+            else
+            {
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("保存失敗")
+                            .WithDescription("Botのデータを保存する権限がありません。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Red)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
+            }
         }
 
         [Command("set"), Summary("ユーザー設定を編集します。")]
