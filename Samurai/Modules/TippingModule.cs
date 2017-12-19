@@ -92,23 +92,7 @@ namespace AcidChicken.Samurai.Modules
             {
                 totalAmount = (decimal)Math.Pow(10, Random.NextDouble()) - 1;
             }
-            var targets =
-                JsonConvert
-                    .DeserializeObject<Dictionary<string, decimal>>(await TippingManager.InvokeMethodAsync("listaccounts").ConfigureAwait(false))
-                    .Where
-                    (user =>
-                        user.Key.StartsWith("discord:") &&
-                        user.Value >= 10 &&
-                        Context.Channel
-                            .GetUsersAsync()
-                            .Flatten()
-                            .Result
-                                .Where(x => x.Id != Context.User.Id)
-                                .Select(x => $"discord:{x.Id}")
-                                .Contains(user.Key)
-                    )
-                    .Select(x => (IUser)DiscordClient.GetUser(ulong.TryParse(new string(x.Key.Skip(8).ToArray()), out ulong result) ? result : 0))
-                    .ToHashSet();
+            var targets = await TippingManager.GetUsersAsync(Context.Channel, Context.User, 10).ConfigureAwait(false);
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);

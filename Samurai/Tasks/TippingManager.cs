@@ -40,6 +40,24 @@ namespace AcidChicken.Samurai.Tasks
 
         public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
 
+        public static async Task<HashSet<IUser>> GetUsersAsync(IChannel channel, IUser exclude, decimal credit = decimal.Zero) =>
+            JsonConvert
+                .DeserializeObject<Dictionary<string, decimal>>(await InvokeMethodAsync("listaccounts").ConfigureAwait(false))
+                .Where
+                (user =>
+                    user.Key.StartsWith("discord:") &&
+                    user.Value >= 10 &&
+                    channel
+                        .GetUsersAsync()
+                        .Flatten()
+                        .Result
+                            .Where(x => x.Id != exclude.Id)
+                            .Select(x => $"discord:{x.Id}")
+                            .Contains(user.Key)
+                )
+                .Select(x => (IUser)DiscordClient.GetUser(ulong.TryParse(new string(x.Key.Skip(8).ToArray()), out ulong result) ? result : 0))
+                .ToHashSet();
+
         public static async Task<string> InvokeMethodAsync(params object[] args)
         {
             using (var process = Process.Start(new ProcessStartInfo("bitzeny-cli", string.Join(' ', args.Select(x => x == null || x is bool || x is sbyte || x is byte || x is short || x is ushort || x is int || x is uint || x is long || x is ulong || x is float || x is double || x is decimal ? x.ToString() : $"\"{x}\"")))
