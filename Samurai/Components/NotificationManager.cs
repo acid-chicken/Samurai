@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-namespace AcidChicken.Samurai.Components
+namespace AcidChicken.Samurai.Discord.Components
 {
     using static Program;
 /*

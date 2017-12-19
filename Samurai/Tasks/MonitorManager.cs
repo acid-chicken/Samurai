@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-namespace AcidChicken.Samurai.Tasks
+namespace AcidChicken.Samurai.Discord.Tasks
 {
     using static Program;
     using Assets;

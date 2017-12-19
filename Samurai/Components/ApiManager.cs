@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Components
+namespace AcidChicken.Samurai.Discord.Components
 {
     using static Program;
     using Models;
