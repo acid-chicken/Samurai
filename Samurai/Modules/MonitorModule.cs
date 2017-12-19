@@ -13,7 +13,7 @@ namespace AcidChicken.Samurai.Modules
     using Components;
     using Models;
     using Tasks;
-
+/*
     [Group("monitor"), Summary("モニターを管理します。"), Alias("m")]
     public class MonitorModule : ModuleBase
     {
@@ -193,5 +193,5 @@ namespace AcidChicken.Samurai.Modules
                 }
             }
         }
-    }
+    } */
 }

@@ -11,7 +11,7 @@ namespace AcidChicken.Samurai.Modules
     using Assets;
     using Components;
     using Tasks;
-
+/*
     [Group("notification"), Summary("通知管理モジュールです。"), Alias("notify", "n")]
     public class NotificationModule : ModuleBase
     {
@@ -121,5 +121,5 @@ namespace AcidChicken.Samurai.Modules
                         .WithAuthor(Context.User)
             ).ConfigureAwait(false);
         }
-    }
+    } */
 }

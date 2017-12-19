@@ -13,7 +13,7 @@ namespace AcidChicken.Samurai.Tasks
     using static Program;
     using Assets;
     using Components;
-
+/*
     public static class MonitorManager
     {
         public static Dictionary<string, IPStatus> Statuses { get; set; } = new Dictionary<string, IPStatus>();
@@ -84,5 +84,5 @@ namespace AcidChicken.Samurai.Tasks
                 await RequestLogAsync(new LogMessage(LogSeverity.Error, "MonitorManager", ex.Message, ex)).ConfigureAwait(false);
             }
         }
-    }
+    } */
 }
