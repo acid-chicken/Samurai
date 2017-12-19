@@ -8,7 +8,7 @@ using Discord.Net;
 using LiteDB;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Discord.Modules
+namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;

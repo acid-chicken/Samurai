@@ -5,7 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace AcidChicken.Samurai.Discord.Modules
+namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;

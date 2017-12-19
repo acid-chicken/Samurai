@@ -13,7 +13,7 @@ using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AcidChicken.Samurai.Discord.Tasks
+namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
     using Components;
