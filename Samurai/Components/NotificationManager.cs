@@ -8,7 +8,7 @@ using Discord.WebSocket;
 namespace AcidChicken.Samurai.Components
 {
     using static Program;
-
+/*
     public static class NotificationManager
     {
         public static HashSet<SocketTextChannel> Channels { get; set; } = new HashSet<SocketTextChannel>();
@@ -18,5 +18,5 @@ namespace AcidChicken.Samurai.Components
             Channels = Channels.Union(ApplicationConfig.NotificationChannels.Select(x => (SocketTextChannel)DiscordClient.GetChannel(x))).ToHashSet();
             return Task.CompletedTask;
         }
-    }
+    } */
 }

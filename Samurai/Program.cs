@@ -55,7 +55,7 @@ namespace AcidChicken.Samurai
             };
             DiscordClient = new DiscordSocketClient(DiscordClientConfig);
             DiscordClient.Log += RequestLogAsync;
-            DiscordClient.Ready += () => Task.WhenAny(NotificationManager.InitAsync(), TippingManager.WorkAsync(), MonitorManager.WorkAsync(), TickerManager.WorkAsync(), Task.Delay(0));
+            DiscordClient.Ready += () => Task.WhenAny(/* NotificationManager.InitAsync() ,*/ TippingManager.WorkAsync(), /* MonitorManager.WorkAsync() ,*/ TickerManager.WorkAsync(), Task.Delay(0));
 
             await ModuleManager.InstallAsync().ConfigureAwait(false);
 
@@ -90,7 +90,7 @@ namespace AcidChicken.Samurai
 
         public static async Task SaveBotConfigAsync()
         {
-            ApplicationConfig.Monitors = MonitorManager.Targets.Zip(MonitorManager.Statuses, (x, y) => new KeyValuePair<string, Monitor>(x.Key, new Monitor(x.Value, y.Value))).ToDictionary(x => x.Key, x => x.Value);
+        //  ApplicationConfig.Monitors = MonitorManager.Targets.Zip(MonitorManager.Statuses, (x, y) => new KeyValuePair<string, Monitor>(x.Key, new Monitor(x.Value, y.Value))).ToDictionary(x => x.Key, x => x.Value);
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 

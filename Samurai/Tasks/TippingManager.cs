@@ -21,22 +21,24 @@ namespace AcidChicken.Samurai.Tasks
 
     public static class TippingManager
     {
-        public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
-
-        public static Task<bool> DequeueAsync(BsonValue value) => Task.FromResult(GetCollection().Delete(value));
-
-        public static Task EnqueueAsync(TipRequest queue)
+        public static Task AddRequestAsync(TipRequest request)
         {
             var collection = GetCollection();
-            collection.Insert(queue);
+            collection.Insert(request);
             collection.EnsureIndex(x => x.From);
             collection.EnsureIndex(x => x.To);
             return Task.CompletedTask;
         }
 
+        public static Task<bool> DeleteRequestAsync(BsonValue value) => Task.FromResult(GetCollection().Delete(value));
+
         public static Task<string> EnsureAccountAsync(string account) => InvokeMethodAsync("getaccountaddress", account);
 
-        public static string GetAccountName(IUser user) => $"discord:{user.Id}";
+        public static string GetAccountName(IUser user) => GetAccountName(user.Id);
+
+        public static string GetAccountName(ulong id) => $"discord:{id}";
+
+        public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
 
         public static async Task<string> InvokeMethodAsync(params object[] args)
         {
@@ -64,13 +66,13 @@ namespace AcidChicken.Samurai.Tasks
                 await Task.WhenAll
                 (
                     RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingManager", "Calling tasks.")),
-                    CheckQueueAsync(),
+                    CheckRequestsAsync(),
                     Task.Delay(60000)
                 ).ConfigureAwait(false);
             }
         }
 
-        public static Task CheckQueueAsync()
+        public static Task CheckRequestsAsync()
         {
             GetCollection().Delete(x => x.Limit < DateTimeOffset.Now);
             return Task.CompletedTask;
