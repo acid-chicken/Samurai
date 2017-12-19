@@ -17,9 +17,6 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("notification_channels")]
         public HashSet<ulong> NotificationChannels { get; set; } = new HashSet<ulong>();
 
-        [JsonProperty("queue")]
-        public List<TipQueue> Queue { get; set; } = new List<TipQueue>();
-
         [JsonProperty("rpc_password")]
         public string RpcPassword { get; set; } = "";
 
@@ -47,29 +44,5 @@ namespace AcidChicken.Samurai.Models
 
         [JsonProperty("last_status")]
         public IPStatus LastStatus { get; set; } = IPStatus.Unknown;
-    }
-
-    [JsonObject]
-    public class TipQueue
-    {
-        public TipQueue(ulong from, ulong to, DateTimeOffset limit, decimal amount)
-        {
-            From = from;
-            To = to;
-            Limit = limit;
-            Amount = amount;
-        }
-
-        [JsonProperty("from")]
-        public ulong From { get; set; }
-
-        [JsonProperty("to")]
-        public ulong To { get; set; }
-
-        [JsonProperty("limit")]
-        public DateTimeOffset Limit { get; set; }
-
-        [JsonProperty("amount")]
-        public decimal Amount { get; set; }
     }
 }

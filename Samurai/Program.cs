@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai
@@ -19,7 +20,7 @@ namespace AcidChicken.Samurai
 
         public static Config ApplicationConfig { get; set; }
 
-        public static HttpClient BitZenyClient { get; set; }
+        public static LiteDatabase Database { get; set; } = new LiteDatabase("samurai.db");
 
         public static DiscordSocketClient DiscordClient { get; set; }
 

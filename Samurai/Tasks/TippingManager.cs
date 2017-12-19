@@ -9,26 +9,28 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
+using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
+    using Components;
     using Models;
 
     public static class TippingManager
     {
-        public static List<TipQueue> Queue { get; set; } = new List<TipQueue>();
+        public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
 
-        public static Task<bool> DequeueAsync(TipQueue queue)
-        {
-            return Task.FromResult(Queue.Remove(queue));
-        }
+        public static Task<bool> DequeueAsync(BsonValue value) => Task.FromResult(GetCollection().Delete(value));
 
-        public static Task EnqueueAsync(TipQueue queue)
+        public static Task EnqueueAsync(TipRequest queue)
         {
-            Queue.Add(queue);
+            var collection = GetCollection();
+            collection.Insert(queue);
+            collection.EnsureIndex(x => x.From);
+            collection.EnsureIndex(x => x.To);
             return Task.CompletedTask;
         }
 
@@ -57,14 +59,6 @@ namespace AcidChicken.Samurai.Tasks
 
         public static async Task WorkAsync(CancellationToken token = default)
         {
-            Queue = Queue.Union(ApplicationConfig.Queue).ToList();
-            BitZenyClient = new HttpClient()
-            {
-                BaseAddress = new Uri(ApplicationConfig.RpcServer),
-                Timeout = Timeout.InfiniteTimeSpan
-            };
-            BitZenyClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{ApplicationConfig.RpcUser}:{ApplicationConfig.RpcPassword}")));
-
             while (!token.IsCancellationRequested)
             {
                 await Task.WhenAll
@@ -78,7 +72,7 @@ namespace AcidChicken.Samurai.Tasks
 
         public static Task CheckQueueAsync()
         {
-            Queue.RemoveAll(x => x.Limit < DateTimeOffset.Now);
+            GetCollection().Delete(x => x.Limit < DateTimeOffset.Now);
             return Task.CompletedTask;
         }
     }

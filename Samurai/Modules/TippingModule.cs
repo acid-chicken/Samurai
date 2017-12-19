@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Net;
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
@@ -12,6 +13,7 @@ namespace AcidChicken.Samurai.Modules
     using static Program;
     using Assets;
     using Components;
+    using Models;
     using Tasks;
 
     [Group(""), Summary("投げ銭モジュールです。")]
@@ -22,13 +24,13 @@ namespace AcidChicken.Samurai.Modules
         {
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
-            await Task.WhenAll(TippingManager.Queue.Where(x => x.To == Context.User.Id).Select(async x =>
+            await Task.WhenAll(TippingManager.GetCollection().Find(x => x.To == Context.User.Id).Select(async x =>
             {
                 try
                 {
                     var from = DiscordClient.GetUser(x.From);
                     var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
-                    var dequeued = await TippingManager.DequeueAsync(x).ConfigureAwait(false);
+                    var dequeued = await TippingManager.DequeueAsync(x.Id).ConfigureAwait(false);
                     await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
                 }
                 catch (Exception ex)
@@ -38,7 +40,7 @@ namespace AcidChicken.Samurai.Modules
             }));
             var balance0 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 0).ConfigureAwait(false));
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-            var queued = TippingManager.Queue.Where(x => x.From == Context.User.Id).Sum(x => x.Amount);
+            var queued = TippingManager.GetCollection().Find(x => x.From == Context.User.Id).Sum(x => x.Amount);
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -88,18 +90,18 @@ namespace AcidChicken.Samurai.Modules
                             .GetUsersAsync()
                             .Flatten()
                             .Result
-                                .Select(x => x.Id)
-                                .Contains(ulong.TryParse(new string(user.Key.Skip(8).ToArray()), out ulong result) ? result : 0)
+                                .Where(x => x.Id != Context.User.Id)
+                                .Select(x => $"discord:{x.Id}")
+                                .Contains(user.Key)
                     )
                     .Select(x => (IUser)DiscordClient.GetUser(ulong.TryParse(new string(x.Key.Skip(8).ToArray()), out ulong result) ? result : 0))
                     .ToHashSet();
-            targets.Remove(Context.User);
             if (targets.Any())
             {
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = totalAmount / targets.Count;
                 var count = targets.Count;
-                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, x.Id, limit, amount))).Append(ReplyAsync
+                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
                     embed:
@@ -176,7 +178,7 @@ namespace AcidChicken.Samurai.Modules
         public async Task TipAsync([Summary("送り先のユーザー")] IUser user, [Remainder, Summary("金額")] decimal amount)
         {
             var limit = DateTimeOffset.Now.AddDays(3);
-            await TippingManager.EnqueueAsync(new Models.TipQueue(Context.User.Id, user.Id, limit, amount));
+            await TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, user.Id, amount, limit));
             await ReplyAsync
             (
                 message: Context.User.Mention,
