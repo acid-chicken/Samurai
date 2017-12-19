@@ -5,6 +5,8 @@ namespace AcidChicken.Samurai.Models
 {
     public class TipRequest
     {
+        public TipRequest() { }
+
         public TipRequest(ulong from, ulong to, decimal amount, DateTimeOffset limit)
         {
             From = from;
