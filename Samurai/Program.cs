@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai
@@ -22,7 +23,7 @@ namespace AcidChicken.Samurai
 
         public static Config ApplicationConfig { get; set; }
 
-        public static HttpClient BitZenyClient { get; set; }
+        public static LiteDatabase Database { get; set; } = new LiteDatabase("samurai.db");
 
         public static CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
 
@@ -90,7 +91,6 @@ namespace AcidChicken.Samurai
         public static async Task SaveBotConfigAsync()
         {
             ApplicationConfig.Monitors = MonitorManager.Targets.Zip(MonitorManager.Statuses, (x, y) => new KeyValuePair<string, Monitor>(x.Key, new Monitor(x.Value, y.Value))).ToDictionary(x => x.Key, x => x.Value);
-            ApplicationConfig.Queue = TippingManager.Queue.ToDictionary(x => x.Key, x => x.Value);
             await SaveConfigAsync(ApplicationConfig).ConfigureAwait(false);
         }
 

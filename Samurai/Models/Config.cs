@@ -26,9 +26,6 @@ namespace AcidChicken.Samurai.Models
         [JsonProperty("prefix_overrides")]
         public Dictionary<ulong, string> PrefixOverrides { get; set; } = new Dictionary<ulong, string>();
 
-        [JsonProperty("queue")]
-        public Dictionary<ulong, List<TipQueue>> Queue { get; set; } = new Dictionary<ulong, List<TipQueue>>();
-
         [JsonProperty("rpc_password")]
         public string RpcPassword { get; set; } = "";
 
@@ -59,25 +56,5 @@ namespace AcidChicken.Samurai.Models
 
         [JsonProperty("last_status")]
         public IPStatus LastStatus { get; set; } = IPStatus.Unknown;
-    }
-
-    [JsonObject]
-    public class TipQueue
-    {
-        public TipQueue(ulong from, DateTimeOffset limit, decimal amount)
-        {
-            From = from;
-            Limit = limit;
-            Amount = amount;
-        }
-
-        [JsonProperty("from")]
-        public ulong From { get; set; }
-
-        [JsonProperty("limit")]
-        public DateTimeOffset Limit { get; set; }
-
-        [JsonProperty("amount")]
-        public decimal Amount { get; set; }
     }
 }
