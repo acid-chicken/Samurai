@@ -37,6 +37,8 @@ namespace AcidChicken.Samurai
 
         public static bool IsLoggerLocked { get; private set; }
 
+        public static Random Random { get; set; } = new Random();
+
         public static async Task Main(string[] args)
         {
             if (File.Exists(ConfigurePath))
