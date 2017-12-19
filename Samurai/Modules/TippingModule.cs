@@ -32,7 +32,7 @@ namespace AcidChicken.Samurai.Modules
                     earned += x.Amount;
                     var from = DiscordClient.GetUser(x.From);
                     var txid = await TippingManager.InvokeMethodAsync("sendfrom", TippingManager.GetAccountName(from), address, x.Amount).ConfigureAwait(false);
-                    var dequeued = await TippingManager.DequeueAsync(x.Id).ConfigureAwait(false);
+                    var isDeleted = await TippingManager.DeleteRequestAsync(x.Id).ConfigureAwait(false);
                     await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {x.Amount} ZNY from {from.Username}#{from.Discriminator} to {Context.User.Username}#{Context.User.Discriminator}."));
                 }
                 catch (Exception ex)
@@ -55,9 +55,9 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
                         .AddInlineField("利用可能", $"{balance1:N8} ZNY")
-                    //  .AddInlineField("利用可能", $"{balance1 - queued:N8} ZNY")
+                        .AddInlineField("利用可能", $"{balance1 - queued:N8} ZNY")
                         .AddInlineField("検証待ち", $"{balance0 - balance1:N8} ZNY")
-                    //  .AddInlineField("受取待ち", $"{queued:N8} ZNY")
+                        .AddInlineField("受取待ち", $"{queued:N8} ZNY")
                         .AddInlineField("受け取り", $"{earned:N8} ZNY")
             ).ConfigureAwait(false);
         }
@@ -116,7 +116,7 @@ namespace AcidChicken.Samurai.Modules
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
-                await Task.WhenAll(targets.Select(x => TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
+                await Task.WhenAll(targets.Select(x => TippingManager.AddRequestAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
                     embed:
@@ -156,8 +156,8 @@ namespace AcidChicken.Samurai.Modules
             var address = await TippingManager.EnsureAccountAsync(TippingManager.GetAccountName(user)).ConfigureAwait(false);
             var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount).ConfigureAwait(false);
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-        //  var queued = TippingManager.Queue.ToList().Select(userQueue => userQueue.Value.Where(x => x.From == Context.User.Id).Sum(x => x.Amount)).Sum();
-            if (amount > 0 && amount < balance1/* - queued*/)
+            var queued = TippingManager.GetCollection().Find(x => x.From == Context.User.Id).Sum(x => x.Amount);
+            if (amount > 0 && amount < balance1 - queued)
             {
                 await ReplyAsync
                 (
@@ -198,7 +198,7 @@ namespace AcidChicken.Samurai.Modules
         public async Task TipAsync([Summary("送り先のユーザー")] IUser user, [Summary("金額")] decimal amount, [Remainder] string comment = null)
         {
             var limit = DateTimeOffset.Now.AddDays(3);
-            await TippingManager.EnqueueAsync(new TipRequest(Context.User.Id, user.Id, amount, limit));
+            await TippingManager.AddRequestAsync(new TipRequest(Context.User.Id, user.Id, amount, limit));
             await ReplyAsync
             (
                 message: Context.User.Mention,
@@ -238,8 +238,8 @@ namespace AcidChicken.Samurai.Modules
             var account = TippingManager.GetAccountName(Context.User);
             await TippingManager.EnsureAccountAsync(account).ConfigureAwait(false);
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
-        //  var queued = TippingManager.Queue.ToList().Select(userQueue => userQueue.Value.Where(x => x.From == Context.User.Id).Sum(x => x.Amount)).Sum();
-            if (amount > 0 && amount < balance1/* - queued*/)
+            var queued = TippingManager.GetCollection().Find(x => x.From == Context.User.Id).Sum(x => x.Amount);
+            if (amount > 0 && amount < balance1 - queued)
             {
                 var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount == decimal.MinusOne ? decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account).ConfigureAwait(false)) : amount).ConfigureAwait(false);
                 await ReplyAsync
