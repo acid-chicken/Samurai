@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -15,6 +16,12 @@ namespace AcidChicken.Samurai.Modules
     public static class ModuleManager
     {
         public const string Prefix = "./";
+
+        public static readonly string[] NonIgnorable = new []
+        {
+            "tip",
+            "send"
+        };
 
         public static ulong Busy;
 
@@ -49,7 +56,10 @@ namespace AcidChicken.Samurai.Modules
                     Prefix,
                     ref position
                 )) ||
-                (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))) return;
+                (
+                    !NonIgnorable.Contains(message.Content.Substring(position).Split(' ')[0]) &&
+                    (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))
+                )) return;
             var context = new CommandContext(DiscordClient, message);
             using (var typing = context.Channel.EnterTypingState())
             {
