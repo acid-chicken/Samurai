@@ -59,7 +59,10 @@ namespace AcidChicken.Samurai.Modules
                         Prefix,
                         ref position
                     ) ||
-                    message.Channel is IDMChannel
+                    (
+                        message.Channel is IDMChannel &&
+                        message.Author.Id != DiscordClient.CurrentUser.Id
+                    )
                 ) ||
                 (
                     !NonIgnorable.Contains(message.Content.Substring(position).Split(' ')[0]) &&
