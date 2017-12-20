@@ -96,20 +96,25 @@ namespace AcidChicken.Samurai.Modules
                 var limit = DateTimeOffset.Now.AddDays(3);
                 var amount = comment?.ToLower()?.Contains("powerful") ?? false ? totalAmount : Math.Truncate(totalAmount / targets.Count * 10000000) / 10000000;
                 var count = targets.Count;
+                var embed =
+                    new EmbedBuilder()
+                        .WithTitle("撒き銭完了")
+                        .WithDescription("撒き銭しました。DM通知は行われませんのでご注意下さい。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Green)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(Context.User)
+                        .AddInlineField("一人あたりの金額", $"{amount:N8} ZNY")
+                        .AddInlineField("対象者数", $"{count} 人")
+                        .AddInlineField("総金額", $"{amount * count:N8} ZNY");
+                if (!string.IsNullOrEmpty(comment))
+                {
+                    embed = embed.AddField("コメント", comment);
+                }
                 await Task.WhenAll(targets.Select(x => TippingManager.AddRequestAsync(new TipRequest(Context.User.Id, x.Id, amount, limit))).Append(ReplyAsync
                 (
                     message: Context.User.Mention,
-                    embed:
-                        new EmbedBuilder()
-                            .WithTitle("撒き銭完了")
-                            .WithDescription("撒き銭しました。DM通知は行われませんのでご注意下さい。")
-                            .WithCurrentTimestamp()
-                            .WithColor(Colors.Green)
-                            .WithFooter(EmbedManager.CurrentFooter)
-                            .WithAuthor(Context.User)
-                            .AddInlineField("一人あたりの金額", $"{amount:N8} ZNY")
-                            .AddInlineField("対象者数", $"{count} 人")
-                            .AddInlineField("総金額", $"{amount * count:N8} ZNY")
+                    embed: embed
                 ))).ConfigureAwait(false);
             }
             else
@@ -134,11 +139,11 @@ namespace AcidChicken.Samurai.Modules
         {
             var account = TippingManager.GetAccountName(Context.User);
             var address = await TippingManager.EnsureAccountAsync(TippingManager.GetAccountName(user)).ConfigureAwait(false);
-            var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount).ConfigureAwait(false);
             var balance1 = decimal.Parse(await TippingManager.InvokeMethodAsync("getbalance", account, 1).ConfigureAwait(false));
             var queued = TippingManager.GetCollection().Find(x => x.From == Context.User.Id).Sum(x => x.Amount);
             if (amount > 0 && amount < balance1 - queued)
             {
+                var txid = await TippingManager.InvokeMethodAsync("sendfrom", account, address, amount).ConfigureAwait(false);
                 await ReplyAsync
                 (
                     message: Context.User.Mention,
@@ -158,26 +163,46 @@ namespace AcidChicken.Samurai.Modules
                 {
                     await ReplyAsync($"```{txid}```");
                 }
+                var embed =
+                    new EmbedBuilder()
+                        .WithTitle("送金通知")
+                        .WithDescription($"{Context.User.Mention} からの送金を受け取りました。")
+                        .WithCurrentTimestamp()
+                        .WithColor(Colors.Orange)
+                        .WithFooter(EmbedManager.CurrentFooter)
+                        .WithAuthor(user)
+                        .WithThumbnailUrl(Context.User.GetAvatarUrl())
+                        .AddInlineField("金額", $"{amount:N8} ZNY")
+                        .AddInlineField("トランザクションID", $"```{txid}```");
+                if (!string.IsNullOrEmpty(comment))
+                {
+                    embed = embed.AddField("コメント", comment);
+                }
                 var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
                 await dm.SendMessageAsync
                 (
                     text: user.Mention,
-                    embed:
-                        new EmbedBuilder()
-                            .WithTitle("送金通知")
-                            .WithDescription($"{Context.User.Mention} からの送金を受け取りました。")
-                            .WithCurrentTimestamp()
-                            .WithColor(Colors.Orange)
-                            .WithFooter(EmbedManager.CurrentFooter)
-                            .WithAuthor(user)
-                            .WithThumbnailUrl(Context.User.GetAvatarUrl())
-                            .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("トランザクションID", $"```{txid}```")
+                    embed: embed
                 ).ConfigureAwait(false);
                 if (TippingManager.GetIsAndroidMode(user))
                 {
                     await dm.SendMessageAsync($"```{txid}```");
                 }
+            }
+            else
+            {
+                await ReplyAsync
+                (
+                    message: Context.User.Mention,
+                    embed:
+                        new EmbedBuilder()
+                            .WithTitle("送金失敗")
+                            .WithDescription("送金に失敗しました。残高が不足している可能性があります。")
+                            .WithCurrentTimestamp()
+                            .WithColor(Colors.Red)
+                            .WithFooter(EmbedManager.CurrentFooter)
+                            .WithAuthor(Context.User)
+                ).ConfigureAwait(false);
             }
             await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {amount:N8} ZNY from {Context.User.Username}#{Context.User.Discriminator} to {user.Username}#{user.Discriminator}.")).ConfigureAwait(false);
         }
@@ -201,21 +226,26 @@ namespace AcidChicken.Samurai.Modules
                         .WithThumbnailUrl(user.GetAvatarUrl())
                         .AddInlineField("金額", $"{amount:N8} ZNY")
             ).ConfigureAwait(false);
+            var embed =
+                new EmbedBuilder()
+                    .WithTitle("投げ銭通知")
+                    .WithDescription($"{Context.User.Mention} から投げ銭が届いています。受取期限までに`{ModuleManager.Prefix}balance`を実行することで投げ銭を受け取れます。")
+                    .WithCurrentTimestamp()
+                    .WithColor(Colors.Orange)
+                    .WithFooter(EmbedManager.CurrentFooter)
+                    .WithAuthor(user)
+                    .WithThumbnailUrl(Context.User.GetAvatarUrl())
+                    .AddInlineField("金額", $"{amount:N8} ZNY")
+                    .AddInlineField("受取期限", limit);
+            if (!string.IsNullOrEmpty(comment))
+            {
+                embed = embed.AddField("コメント", comment);
+            }
             var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
             await dm.SendMessageAsync
             (
                 text: user.Mention,
-                embed:
-                    new EmbedBuilder()
-                        .WithTitle("投げ銭通知")
-                        .WithDescription($"{Context.User.Mention} から投げ銭が届いています。受取期限までに`{ModuleManager.Prefix}balance`を実行することで投げ銭を受け取れます。")
-                        .WithCurrentTimestamp()
-                        .WithColor(Colors.Orange)
-                        .WithFooter(EmbedManager.CurrentFooter)
-                        .WithAuthor(user)
-                        .WithThumbnailUrl(Context.User.GetAvatarUrl())
-                        .AddInlineField("金額", $"{amount:N8} ZNY")
-                        .AddInlineField("受取期限", limit)
+                embed: embed
             ).ConfigureAwait(false);
         }
 
