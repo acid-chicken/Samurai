@@ -77,9 +77,7 @@ namespace AcidChicken.Samurai.Modules
                         .WithFooter(EmbedManager.CurrentFooter)
                         .WithAuthor(Context.User)
             ).ConfigureAwait(false);
-            if (ApplicationConfig.Settings.ContainsKey(Context.User.Id) && ApplicationConfig.Settings[Context.User.Id].ContainsKey("mode_android") ?
-                ApplicationConfig.Settings[Context.User.Id]["mode_android"] == "1" :
-                ApplicationConfig.DefaultSettings.ContainsKey("mode_android") && ApplicationConfig.DefaultSettings["mode_android"] == "1")
+            if (TippingManager.GetIsAndroidMode(Context.User))
             {
                 await ReplyAsync($"```{address}```");
             }
@@ -154,8 +152,12 @@ namespace AcidChicken.Samurai.Modules
                             .WithAuthor(Context.User)
                             .WithThumbnailUrl(user.GetAvatarUrl())
                             .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("トランザクションID", txid)
+                            .AddInlineField("トランザクションID", $"```{txid}```")
                 ).ConfigureAwait(false);
+                if (TippingManager.GetIsAndroidMode(Context.User))
+                {
+                    await ReplyAsync($"```{txid}```");
+                }
                 var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
                 await dm.SendMessageAsync
                 (
@@ -170,8 +172,12 @@ namespace AcidChicken.Samurai.Modules
                             .WithAuthor(user)
                             .WithThumbnailUrl(Context.User.GetAvatarUrl())
                             .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("受取期限", txid)
+                            .AddInlineField("トランザクションID", $"```{txid}```")
                 ).ConfigureAwait(false);
+                if (TippingManager.GetIsAndroidMode(user))
+                {
+                    await dm.SendMessageAsync($"```{txid}```");
+                }
             }
             await RequestLogAsync(new LogMessage(LogSeverity.Verbose, "TippingModule", $"Sent {amount:N8} ZNY from {Context.User.Username}#{Context.User.Discriminator} to {user.Username}#{user.Discriminator}.")).ConfigureAwait(false);
         }
@@ -194,7 +200,6 @@ namespace AcidChicken.Samurai.Modules
                         .WithAuthor(Context.User)
                         .WithThumbnailUrl(user.GetAvatarUrl())
                         .AddInlineField("金額", $"{amount:N8} ZNY")
-                        .AddInlineField("受取期限", limit)
             ).ConfigureAwait(false);
             var dm = await user.GetOrCreateDMChannelAsync().ConfigureAwait(false);
             await dm.SendMessageAsync
@@ -236,8 +241,12 @@ namespace AcidChicken.Samurai.Modules
                             .WithFooter(EmbedManager.CurrentFooter)
                             .WithAuthor(Context.User)
                             .AddInlineField("金額", $"{amount:N8} ZNY")
-                            .AddInlineField("トランザクションID", txid)
+                            .AddInlineField("トランザクションID", $"```{txid}```")
                 ).ConfigureAwait(false);
+                if (TippingManager.GetIsAndroidMode(Context.User))
+                {
+                    await ReplyAsync($"```{txid}```");
+                }
             }
         }
     }

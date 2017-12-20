@@ -40,6 +40,13 @@ namespace AcidChicken.Samurai.Tasks
 
         public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
 
+        public static bool GetIsAndroidMode(IUser user) => GetIsAndroidMode(user.Id);
+
+        public static bool GetIsAndroidMode(ulong id) =>
+            ApplicationConfig.Settings.ContainsKey(id) && ApplicationConfig.Settings[id].ContainsKey("mode_android") ?
+            ApplicationConfig.Settings[id]["mode_android"] == "1" :
+            ApplicationConfig.DefaultSettings.ContainsKey("mode_android") && ApplicationConfig.DefaultSettings["mode_android"] == "1";
+
         public static async Task<HashSet<IUser>> GetUsersAsync(IChannel channel, IUser exclude, decimal credit = decimal.Zero) =>
             JsonConvert
                 .DeserializeObject<Dictionary<string, decimal>>(await InvokeMethodAsync("listaccounts").ConfigureAwait(false))
