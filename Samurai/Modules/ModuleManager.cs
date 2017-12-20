@@ -47,15 +47,18 @@ namespace AcidChicken.Samurai.Modules
             var message = socketMessage as SocketUserMessage;
             var guildChannel = message.Channel as IGuildChannel;
             if (message == null ||
-                !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) ||
-                message.HasStringPrefix
-                (
-                    guildChannel != null &&
-                    ApplicationConfig.PrefixOverrides.ContainsKey(guildChannel.GuildId) ?
-                    ApplicationConfig.PrefixOverrides[guildChannel.GuildId] :
-                    Prefix,
-                    ref position
-                )) ||
+                !(
+                    (message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) ||
+                    message.HasStringPrefix
+                    (
+                        guildChannel != null &&
+                        ApplicationConfig.PrefixOverrides.ContainsKey(guildChannel.GuildId) ?
+                        ApplicationConfig.PrefixOverrides[guildChannel.GuildId] :
+                        Prefix,
+                        ref position
+                    ) ||
+                    message.Channel is IDMChannel
+                ) ||
                 (
                     !NonIgnorable.Contains(message.Content.Substring(position).Split(' ')[0]) &&
                     (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))
