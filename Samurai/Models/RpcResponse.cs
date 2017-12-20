@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AcidChicken.Samurai.Discord.Models
+namespace AcidChicken.Samurai.Models
 {
     [JsonObject]
     public class RpcResponse<T>

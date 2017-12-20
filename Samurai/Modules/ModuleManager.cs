@@ -7,7 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace AcidChicken.Samurai.Discord.Modules
+namespace AcidChicken.Samurai.Modules
 {
     using static Program;
     using Assets;
@@ -31,6 +31,8 @@ namespace AcidChicken.Samurai.Discord.Modules
             Service = new CommandService();
         }
 
+        public static IEmote Reaction { get; set; } = new Emoji("\uD83D\uDC40");
+
         public static CommandService Service { get; }
 
         public static CommandServiceConfig ServiceConfig { get; }
@@ -47,23 +49,27 @@ namespace AcidChicken.Samurai.Discord.Modules
             var message = socketMessage as SocketUserMessage;
             var guildChannel = message.Channel as IGuildChannel;
             if (message == null ||
-                !((message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) ||
-                message.HasStringPrefix
-                (
-                    guildChannel != null &&
-                    ApplicationConfig.PrefixOverrides.ContainsKey(guildChannel.GuildId) ?
-                    ApplicationConfig.PrefixOverrides[guildChannel.GuildId] :
-                    Prefix,
-                    ref position
-                )) ||
+                !(
+                    (message.HasMentionPrefix(DiscordClient.CurrentUser, ref position)) ||
+                    message.HasStringPrefix
+                    (
+                        guildChannel != null &&
+                        ApplicationConfig.PrefixOverrides.ContainsKey(guildChannel.GuildId) ?
+                        ApplicationConfig.PrefixOverrides[guildChannel.GuildId] :
+                        Prefix,
+                        ref position
+                    ) ||
+                    message.Channel is IDMChannel
+                ) ||
                 (
                     !NonIgnorable.Contains(message.Content.Substring(position).Split(' ')[0]) &&
                     (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))
                 )) return;
+            await message.AddReactionAsync(Reaction);
             var context = new CommandContext(DiscordClient, message);
             using (var typing = context.Channel.EnterTypingState())
             {
-                if (++Busy > ApplicationConfig.Busy)
+                if (++Busy > ApplicationConfig.Busy && !ApplicationConfig.Managers.Contains(context.User.Id))
                 {
                     await context.Channel.SendMessageAsync
                     (
@@ -100,6 +106,7 @@ namespace AcidChicken.Samurai.Discord.Modules
                 }
             }
             Busy--;
+            await message.RemoveReactionAsync(Reaction, DiscordClient.CurrentUser);
         }
     }
 }

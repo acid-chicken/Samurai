@@ -1,7 +1,7 @@
 using System;
 using Discord;
 
-namespace AcidChicken.Samurai.Discord.Assets
+namespace AcidChicken.Samurai.Assets
 {
     public static class Colors
     {

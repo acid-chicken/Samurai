@@ -13,7 +13,7 @@ using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AcidChicken.Samurai.Discord.Tasks
+namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
     using Components;
@@ -39,6 +39,13 @@ namespace AcidChicken.Samurai.Discord.Tasks
         public static string GetAccountName(ulong id) => $"discord:{id}";
 
         public static LiteCollection<TipRequest> GetCollection() => Database.GetCollection<TipRequest>("tiprequests");
+
+        public static bool GetIsAndroidMode(IUser user) => GetIsAndroidMode(user.Id);
+
+        public static bool GetIsAndroidMode(ulong id) =>
+            ApplicationConfig.Settings.ContainsKey(id) && ApplicationConfig.Settings[id].ContainsKey("mode_android") ?
+            ApplicationConfig.Settings[id]["mode_android"] == "1" :
+            ApplicationConfig.DefaultSettings.ContainsKey("mode_android") && ApplicationConfig.DefaultSettings["mode_android"] == "1";
 
         public static async Task<HashSet<IUser>> GetUsersAsync(IChannel channel, IUser exclude, decimal credit = decimal.Zero) =>
             JsonConvert

@@ -10,7 +10,7 @@ using Discord.WebSocket;
 using LiteDB;
 using Newtonsoft.Json;
 
-namespace AcidChicken.Samurai.Discord
+namespace AcidChicken.Samurai
 {
     using Components;
     using Models;

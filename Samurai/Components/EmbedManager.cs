@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using Discord;
 
-namespace AcidChicken.Samurai.Discord.Components
+namespace AcidChicken.Samurai.Components
 {
     using static Program;
 
