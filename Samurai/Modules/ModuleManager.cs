@@ -69,7 +69,7 @@ namespace AcidChicken.Samurai.Modules
             var context = new CommandContext(DiscordClient, message);
             using (var typing = context.Channel.EnterTypingState())
             {
-                if (++Busy > ApplicationConfig.Busy)
+                if (++Busy > ApplicationConfig.Busy && !ApplicationConfig.Managers.Contains(context.User.Id))
                 {
                     await context.Channel.SendMessageAsync
                     (
