@@ -31,6 +31,8 @@ namespace AcidChicken.Samurai.Modules
             Service = new CommandService();
         }
 
+        public static IEmote Reaction { get; set; } = new Emoji("\uD83D\uDC40");
+
         public static CommandService Service { get; }
 
         public static CommandServiceConfig ServiceConfig { get; }
@@ -63,6 +65,7 @@ namespace AcidChicken.Samurai.Modules
                     !NonIgnorable.Contains(message.Content.Substring(position).Split(' ')[0]) &&
                     (guildChannel != null && ((guildChannel as ITextChannel)?.Topic?.Contains("./ignore") ?? false))
                 )) return;
+            await message.AddReactionAsync(Reaction);
             var context = new CommandContext(DiscordClient, message);
             using (var typing = context.Channel.EnterTypingState())
             {
@@ -103,6 +106,7 @@ namespace AcidChicken.Samurai.Modules
                 }
             }
             Busy--;
+            await message.RemoveReactionAsync(Reaction, DiscordClient.CurrentUser);
         }
     }
 }
