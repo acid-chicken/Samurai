@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Models;
+using AcidChicken.Samurai.Modules;
+using AcidChicken.Samurai.Tasks;
 using Discord;
 using Discord.WebSocket;
 using LiteDB;
@@ -12,11 +13,6 @@ using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai
 {
-    using Components;
-    using Models;
-    using Modules;
-    using Tasks;
-
     public static class Program
     {
         public const string ConfigurePath = "config.json";

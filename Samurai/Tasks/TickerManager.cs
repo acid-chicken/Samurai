@@ -1,15 +1,13 @@
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Components;
+using AcidChicken.Samurai.Models;
 using Discord;
-using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Tasks
 {
     using static Program;
-    using Components;
-    using Models;
 
     public static class TickerManager
     {

@@ -1,10 +1,7 @@
-using System;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Models
 {
-    using Tasks;
-
     [JsonObject]
     public class Ticker
     {

@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Models;
 using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Components
 {
-    using static Program;
-    using Models;
     public static class ApiManager
     {
         public static async Task<Ticker> GetTickerAsync(string id, string convert = null)

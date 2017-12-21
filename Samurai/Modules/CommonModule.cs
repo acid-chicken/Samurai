@@ -4,16 +4,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Assets;
+using AcidChicken.Samurai.Components;
 using Discord;
 using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
     using static Program;
-    using Assets;
-    using Components;
-    using Models;
-    using Tasks;
 
     [Group(""), Summary("汎用モジュールです。")]
     public class CommonModule : ModuleBase

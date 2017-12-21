@@ -1,20 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Assets;
+using AcidChicken.Samurai.Components;
+using AcidChicken.Samurai.Models;
+using AcidChicken.Samurai.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.Net;
-using LiteDB;
-using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
 {
     using static Program;
-    using Assets;
-    using Components;
-    using Models;
-    using Tasks;
 
     [Group(""), Summary("投げ銭モジュールです。")]
     public class TippingModule : ModuleBase
