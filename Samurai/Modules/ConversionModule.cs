@@ -1,15 +1,12 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Assets;
+using AcidChicken.Samurai.Components;
 using Discord;
 using Discord.Commands;
 
 namespace AcidChicken.Samurai.Modules
 {
-    using static Program;
-    using Assets;
-    using Components;
-
     [Group("conversion"), Summary("通貨換算モジュールです。"), Alias("conv", "c")]
     public class ConversionModule : ModuleBase
     {

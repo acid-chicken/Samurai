@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Assets;
+using AcidChicken.Samurai.Components;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -10,8 +11,6 @@ using Discord.WebSocket;
 namespace AcidChicken.Samurai.Modules
 {
     using static Program;
-    using Assets;
-    using Components;
 
     public static class ModuleManager
     {

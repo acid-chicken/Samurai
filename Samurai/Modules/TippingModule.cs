@@ -1,20 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AcidChicken.Samurai.Assets;
+using AcidChicken.Samurai.Components;
+using AcidChicken.Samurai.Models;
+using AcidChicken.Samurai.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.Net;
-using LiteDB;
-using Newtonsoft.Json;
 
 namespace AcidChicken.Samurai.Modules
 {
     using static Program;
-    using Assets;
-    using Components;
-    using Models;
-    using Tasks;
 
     [Group(""), Summary("投げ銭モジュールです。")]
     public class TippingModule : ModuleBase
@@ -88,7 +84,7 @@ namespace AcidChicken.Samurai.Modules
         {
             if (totalAmount == decimal.MinusOne)
             {
-                totalAmount = (decimal)Math.Pow(10, Random.NextDouble()) - 1;
+                totalAmount = (decimal)Math.Pow(10, Program.Random.NextDouble()) - 1;
             }
             var targets = await TippingManager.GetUsersAsync(Context.Channel, Context.User, 10).ConfigureAwait(false);
             if (targets.Any())
