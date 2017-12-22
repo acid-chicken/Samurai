@@ -88,7 +88,7 @@ namespace AcidChicken.Samurai.Modules
         {
             if (totalAmount == decimal.MinusOne)
             {
-                totalAmount = (decimal)Math.Pow(10, Random.NextDouble()) - 1;
+                totalAmount = (decimal)Math.Pow(10, Randomizer.NextDouble()) - 1;
             }
             var targets = await TippingManager.GetUsersAsync(Context.Channel, Context.User, 10).ConfigureAwait(false);
             if (targets.Any())

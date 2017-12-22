@@ -31,13 +31,13 @@ namespace AcidChicken.Samurai
 
         public static DiscordSocketConfig DiscordClientConfig { get; set; }
 
-        public static HttpClient HttpClient { get; set; } = new HttpClient();
+        public static HttpClient CoinMarketCapClient { get; set; } = new HttpClient();
 
         public static bool IsConfigLocked { get; private set; }
 
         public static bool IsLoggerLocked { get; private set; }
 
-        public static Random Random { get; set; } = new Random();
+        public static Random Randomizer { get; set; } = new Random();
 
         public static async Task Main(string[] args)
         {
